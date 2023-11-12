@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import lessonPlansReducer from './Reducers/lessonPlansSlice'
+import lessonPlanListReducer from './Reducers/LessonPlanList'
 // ...
 
 const store = configureStore({
   reducer: {
+    lessonPlanList: lessonPlanListReducer,
     lessonPlans: lessonPlansReducer,
   },
 })

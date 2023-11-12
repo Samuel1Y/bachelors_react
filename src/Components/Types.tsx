@@ -1,3 +1,5 @@
+//props------------------------
+
 export type HeaderProps = {
 }
 
@@ -10,5 +12,31 @@ export type ButtonProps = {
 
   export type TextProps = {
     text: string | undefined,
+    sx?: object,
+  }
+
+  export type TitleComponentProps = {
+    text?: string,
+    sx?: object,
+  }
+
+  export type LessonPageComponentProps = {
+    components: Array<any>,
+    sx?: object,
+  }
+//objects------------------------
+
+  export type LessonPlan = {
+    title: string
+    lessons: Array<Lesson>
+  }
+
+  export type Lesson = {
+    title: string
+    components: Array<LessonPage>
+  }
+
+  export type LessonPage = {
+    components: Array<any>,
     sx?: object,
   }

@@ -59,6 +59,9 @@ export const lessonPlansSlice = createSlice({
       shareLessonPlan (state, action) {
         return {...state, code: action.payload, title: "dummy title"}
       },
+      setLessonPlanTitle (state, action) {
+        return {...state, title: action.payload}
+      },
     },
     extraReducers: builder => {
       builder
@@ -83,7 +86,7 @@ export const lessonPlansSlice = createSlice({
 )
 
 
-export const { getLessonPlan } = lessonPlansSlice.actions
+export const { getLessonPlan, setLessonPlanTitle } = lessonPlansSlice.actions
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectLessonPlan = (state: RootState) => state.lessonPlans

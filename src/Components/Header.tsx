@@ -18,8 +18,7 @@ export const Header: React.FC<HeaderProps> = ({
         maxHeight: '100vh',
         minWidth: '100vw',
         backgroundColor: '#282a32',
-        marginBottom:'1rem',
-    }}>
+     }}>
         <Title text='LEGO   '/>
     </Box>
 )}
