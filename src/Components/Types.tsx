@@ -20,6 +20,16 @@ export type ButtonProps = {
     sx?: object,
   }
 
+  export type LessonPlanProps = {
+    title?: string,
+    sx?: object,
+  }
+
+  export type LessonProps = {
+    title?: string,
+    sx?: object,
+  }
+
   export type LessonPageComponentProps = {
     components: Array<any>,
     sx?: object,
