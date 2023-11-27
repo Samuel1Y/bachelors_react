@@ -6,7 +6,8 @@ import { Subtitle } from '../Components/Text';
 import { useAppDispatch, useAppSelector } from '../Redux/hooks'
 import { connect } from 'react-redux';
 import { getLessonPlan, getLessonPlanAPI, setLessonPlanTitle, shareLessonPlanAPI } from '../Redux/Reducers/lessonPlansSlice';
-import { addLessonPlan } from '../Redux/Reducers/LessonPlanList';
+import { addLessonPlan, setLessonPlanList } from '../Redux/Reducers/LessonPlanListSlice';
+import { LessonPlanComponent } from '../Components/LessonPlanComponent';
 
 
 function Home() {
@@ -14,6 +15,7 @@ function Home() {
 
     const [codeInput, setCodeInput] = React.useState('226492')
     const [titleInput, setTitleInput] = React.useState('')
+    const [LessonPlanTitleInput, setLessonPlanTitleInput] = React.useState('')
 
     const [generatedCode, setGeneratedCode] = React.useState('')
 
@@ -47,15 +49,24 @@ function Home() {
         navigate('/lessonPage')
     }
 
-    const handleShare = (titleInput:string) => {
-        // dispatch(shareLessonPlanAPI(titleInput))
-        console.log(titleInput)
+    const handleCreateLessonPlan = (LessonPlanTitleInput:string) => {
+        dispatch(addLessonPlan(LessonPlanTitleInput))
+        //setLessonPlanTitleInput('')
     }
-
 
     useEffect(() => {
 
     }, []);
+// mock
+    const data = [
+        {
+            title:'Saved Projects'
+        },
+        {
+            title:'custom 1'
+        },
+    ]
+        dispatch(setLessonPlanList(data))
 
     return (
         <Box
@@ -133,26 +144,65 @@ function Home() {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '1rem',
+                alignItems:'center',
+                justifyContent:'start',
                 flex: 1,
+                border:'2px solid purple',
+                borderRadius:5,
+                margin:'1rem',
                 paddingX: '1rem',
+                padding:'2rem',
                 maxHeight: '89vh',
                 overflow: 'auto'
             }}>
             {lessonPlanList?.map((lessonPlan, index) => (
-                
-              <div key={index} className={'Component '+index} style={{maxWidth:'30rem', maxHeight:'8rem'}}>
-                {lessonPlan.title}
-                <DefaultButton label='Share' onClick={() => handleShare(lessonPlan.title)}
-                sx={{
-                    width:'1rem',
-                    height:'1.5rem',
-                    fontSize: '0.5rem',
-                    marginX:'1rem'
-                }} />
-              </div>
+              <LessonPlanComponent key={index} title={lessonPlan.title}/>
               ))}
-            </Box>
-            </Box>
+              
+              <div
+                style={{
+                    display:'flex',
+                    flexDirection: 'row',
+                    alignItems:'center',
+                    justifyContent:'space-between',
+                    padding:'0.5rem',
+                    width:'-webkit-fill-available',
+                    height:'2rem',
+                    border:'2px solid lightgray',
+                    borderRadius: '8px',
+                }}
+                >
+                <TextField
+                    label='Enter Title'
+                    type='text'
+                    variant='standard'
+                    size='small'
+                    value={LessonPlanTitleInput}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLessonPlanTitleInput(e.target.value)}
+                    sx={{
+                        height: '3rem',
+                    }}
+                />
+                <DefaultButton label='Add' 
+                onClick={(e) => {
+                e.stopPropagation(); // Prevent the click event from reaching the parent div
+                handleCreateLessonPlan(LessonPlanTitleInput);}}
+                        sx={{
+                        width:'1rem',
+                        height:'1.5rem',
+                        fontSize: '0.5rem',
+                        marginX:'1rem',
+                        backgroundColor:'green',
+                        ':hover': {
+                        backgroundColor:'darkGreen',
+                        },
+                        '&.Mui-disabled': {
+                        opacity:'.4',
+                        },
+                    }} />
+            </div>
+    </Box>
+    </Box>
     )
 }
 

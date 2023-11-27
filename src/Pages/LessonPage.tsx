@@ -7,7 +7,7 @@ import { getLessonPlan, getLessonPlanAPI, shareLessonPlanAPI } from '../Redux/Re
 import { LessonPageComponent } from '../Components/LessonPageComponent'
 import { DefaultButton } from '../Components/DefaultButton'
 import { TitleComponent } from '../Components/TitleComponent'
-import { addLessonPlan } from '../Redux/Reducers/LessonPlanList'
+import { addLessonPlan } from '../Redux/Reducers/LessonPlanListSlice'
 
 
 function LessonPage() {

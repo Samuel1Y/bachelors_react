@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import lessonPlansReducer from './Reducers/lessonPlansSlice'
-import lessonPlanListReducer from './Reducers/LessonPlanList'
+import lessonPlanListReducer from './Reducers/LessonPlanListSlice'
 // ...
 
 const store = configureStore({
