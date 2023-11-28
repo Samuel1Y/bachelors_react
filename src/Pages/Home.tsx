@@ -66,7 +66,6 @@ function Home() {
             title:'custom 1'
         },
     ]
-        dispatch(setLessonPlanList(data))
 
     return (
         <Box

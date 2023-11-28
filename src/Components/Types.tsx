@@ -43,10 +43,29 @@ export type ButtonProps = {
 
   export type Lesson = {
     title: string
-    components: Array<LessonPage>
+    username: string
+    sharingTime: number //sharing time in minutes
+    codeBlocks: Array<CodeBlock>
+    descriptions: Array<Description>
+    numberOfPages: number
   }
 
+  //to delete
   export type LessonPage = {
     components: Array<any>,
     sx?: object,
+  }
+
+  export type CodeBlock = {
+    codeBlockId: number
+    slot: number
+    pageNumber: number 
+    jsonBlocks: string
+  }
+
+  export type Description = {
+    descriptionId: number
+    slot: number
+    pageNumber: number 
+    text: string
   }
