@@ -37,9 +37,9 @@ function LessonPlanView() {
     useEffect(() => {
       if(pathname.split('/')[1] === 'Saved%20Lessons')
       {
-          setCurrentLessonPlan(lessonPlanList.find((lessonPlan) => lessonPlan.title === 'Saved Lessons'))
+          setCurrentLessonPlan(lessonPlanList.find((lessonPlan: LessonPlan) => lessonPlan.title === 'Saved Lessons'))
       }
-      else setCurrentLessonPlan(lessonPlanList.find((lessonPlan) => lessonPlan.title === pathname.split('/')[1]))
+      else setCurrentLessonPlan(lessonPlanList.find((lessonPlan: LessonPlan) => lessonPlan.title === pathname.split('/')[1]))
     }, [lessonPlanList, pathname])
 
 

@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import { getLessonPlan, getLessonPlanAPI, setLessonPlanTitle, shareLessonPlanAPI } from '../Redux/Reducers/lessonPlansSlice';
 import { addLessonPlan, setLessonPlanList } from '../Redux/Reducers/LessonPlanListSlice';
 import { LessonPlanComponent } from '../Components/LessonPlanComponent';
+import { LessonPlan } from '../Components/Types';
 
 
 function Home() {
@@ -154,7 +155,7 @@ function Home() {
                 maxHeight: '89vh',
                 overflow: 'auto'
             }}>
-            {lessonPlanList?.map((lessonPlan, index) => (
+            {lessonPlanList?.map((lessonPlan: LessonPlan, index: number) => (
               <LessonPlanComponent key={index} title={lessonPlan.title}/>
               ))}
               
