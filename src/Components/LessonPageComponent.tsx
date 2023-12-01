@@ -33,7 +33,25 @@ export const LessonPageComponent: React.FC<LessonPageComponentProps> = ({
     }
   };
 
-  const onDragEnd2 = (index:number, delta:number) => {
+  function checkCollision(componentIndex: number, deltaY: number): boolean {
+    const componentHeight = pageRef.current?.offsetHeight! / 5;
+    const componentTop = componentIndex * componentHeight + deltaY;
+    
+    for (let i = 0; i < componentsToRender.length; i++) {
+      if (i !== componentIndex) {
+        const otherComponentTop = i * componentHeight;
+        const otherComponentBottom = otherComponentTop + componentHeight;
+        
+        if (componentTop >= otherComponentTop && componentTop <= otherComponentBottom) {
+          return true; // Collision detected
+        }
+      }
+    }
+    
+    return false; // No collision detected
+  }
+
+  const onDragEnd2 = (index: number, delta: number) => {
     const cellHeight = pageRef.current?.offsetHeight! / 5;
     const offset = Math.round(delta / cellHeight);
   
@@ -42,9 +60,14 @@ export const LessonPageComponent: React.FC<LessonPageComponentProps> = ({
       if (newIndex >= 0 && newIndex < componentsToRender.length) {
         const updatedItems = [...componentsToRender];
         const [draggedItem] = updatedItems.splice(index, 1);
-        updatedItems.splice(newIndex, 0, draggedItem);
-        console.log('index: '+index)
-        console.log('new index: '+newIndex)
+  
+        // Move the dragged item to the next available spot
+        let nextIndex = newIndex;
+        while (nextIndex < componentsToRender.length && updatedItems[nextIndex]) {
+          nextIndex++;
+        }
+        updatedItems.splice(nextIndex, 0, draggedItem);
+  
         setComponentsToRender(updatedItems);
       }
     }
@@ -98,8 +121,10 @@ export const LessonPageComponent: React.FC<LessonPageComponentProps> = ({
                 onDrag={eventHandler}
                 key={index}
                 onStop={(e, data) => {
-                  onDragEnd2(index, data.deltaY); // not working
-                }}
+                  const collisionDetected = checkCollision(index, data.deltaY);
+                  if (!collisionDetected) {
+                    onDragEnd2(index, data.deltaY);
+                  }                }}
                 grid={[ pageRef.current?.offsetWidth!, pageRef.current?.offsetHeight!/5]}
               >
               <div key={index} className={'Component '+index} style={{maxWidth:'30rem', maxHeight:'8rem'}}>

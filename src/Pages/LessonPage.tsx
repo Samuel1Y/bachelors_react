@@ -63,7 +63,7 @@ function LessonPage() {
                 bgcolor:'lightgray'
             }}>
           <LessonPageComponent 
-          components={[<TitleComponent text={lessonPlan.title} />, <div></div>, <div></div>, <div></div>,<div></div>]} />
+          components={[<TitleComponent text={lessonPlan.title} />, <TitleComponent text={"ja neviem"} />, <div></div>, <div></div>,<div></div>]} />
         </Box>
 
       </Box>

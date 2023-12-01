@@ -1,12 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { RootState } from '../store'
 import { CodeBlock, Description, Lesson, LessonPage, LessonPlan } from '../../Components/Types';
-import { getLessonAPI, shareLessonAPI } from '../Thunks/lessonThunk';
 
 // Define a type for the slice state
 export interface LessonPlanListState {
   lessonPlans: Array<LessonPlan>,
-  status: any,
+  status: null,
 }
 
 // Define the initial state using that type
@@ -48,7 +47,7 @@ export const lessonPlanListSlice = createSlice({
           sharingTime: 120,
           codeBlocks: new Array<CodeBlock>(),
           descriptions: new Array<Description>(),
-          numberOfPages: 1
+          numberOfPages: 1, 
         }
         state.lessonPlans.find((lessonPlan) => lessonPlan.title === action.payload.LessonPlanTitle)?.lessons.push(Lesson)
         return state
@@ -56,32 +55,7 @@ export const lessonPlanListSlice = createSlice({
       removeLesson (state, action) {
         return {...state, ...action.payload}
       },
-      getLesson (state, action) {
-        return {...state, code: action.payload, title: "dummy title"}
-      },
-      shareLesson (state, action) {
-        return {...state, code: action.payload, title: "dummy title"}
-      },
     },
-    extraReducers: builder => {
-      builder
-        .addCase(getLessonAPI.pending, (state, action) => {
-          state.status = 'loading'
-        })
-        .addCase(getLessonAPI.fulfilled, (state, action) => {
-          // return {...state, ...action.payload, status: 'idle'}
-          return {...state, title: action.payload.title, status: 'idle'}
-        })
-        .addCase(getLessonAPI.rejected, (state, action) => {
-          return {...state, title: 'error', status: 'idle'}
-        })
-        .addCase(shareLessonAPI.fulfilled, (state, action) => {
-          return {...state, code: action.payload.code, status: 'idle'}
-        })
-        .addCase(shareLessonAPI.rejected, (state, action) => {
-          return {...state, code: '-1', status: 'idle'}
-        })
-    }
   },
 )
 
