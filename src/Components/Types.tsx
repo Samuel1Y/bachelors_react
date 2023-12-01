@@ -20,6 +20,11 @@ export type ButtonProps = {
     sx?: object,
   }
 
+  export type DescriptionComponentProps = {
+    text?: string,
+    sx?: object,
+  }
+
   export type LessonPlanProps = {
     title?: string,
     sx?: object,
