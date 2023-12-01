@@ -1,15 +1,19 @@
 import React from 'react'
 
-import { LessonPlanProps } from './Types'
+import { CodeBlock, Description, Lesson, LessonPlanProps } from './Types'
 import { Box, Typography } from '@mui/material'
 import { useAppDispatch } from '../Redux/hooks'
 import { DefaultButton } from './DefaultButton'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { shareLessonAPI } from '../Redux/Thunks/lessonThunk'
+import { AsyncThunkAction, Dispatch, AnyAction } from '@reduxjs/toolkit'
 
 export const LessonComponent: React.FC<LessonPlanProps> = ({
   title,
   sx,
 }) => {
+
+  const dispatch = useAppDispatch()
 
   const navigate = useNavigate() //use for navigation
   const { pathname } = useLocation()
@@ -24,6 +28,21 @@ export const LessonComponent: React.FC<LessonPlanProps> = ({
   const handleRemove = () => {
     // dispatch(shareLessonPlanAPI(titleInput))
     console.log(title)
+  }
+
+  const handleShare = () => {
+    if (title) {
+      const Lesson: Lesson = {
+        title: title,
+        username: "user",
+        sharingTime: 120,
+        codeBlocks: new Array<CodeBlock>(),
+        descriptions: new Array<Description>(),
+        numberOfPages: 1
+      }
+      dispatch(shareLessonAPI(Lesson))
+      console.log(title)
+    }
   }
 
 return (
@@ -64,7 +83,7 @@ return (
   <DefaultButton label='Share' 
     onClick={(e) => {
       e.stopPropagation(); // Prevent the click event from reaching the parent div
-      
+      handleShare();
     }}
         sx={{
         display:'flex',

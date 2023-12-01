@@ -18,9 +18,9 @@ export const getLessonAPI = createAsyncThunk('lessonPlanList/getLesson', async (
 
 // send title of the lesson, API will return access code that belongs to the sent lesson plan
 export const shareLessonAPI = createAsyncThunk('lessonPlanList/shareLesson', async (lesson: Lesson) => {
-
   const response = await axios.post(`${BASE_API_URL}/Lesson`, lesson)
   try {
+    console.log(response.statusText)
     if (response.status === 201) {
         const data = await response.data
         return data
@@ -28,6 +28,7 @@ export const shareLessonAPI = createAsyncThunk('lessonPlanList/shareLesson', asy
         return response.statusText
     }
   } catch (error) {
+    console.log(response.statusText)
     return ('An error occurred' + error);
   }
 })

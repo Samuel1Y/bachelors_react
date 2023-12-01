@@ -1,11 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { RootState } from '../store'
-import { Lesson, LessonPage, LessonPlan } from '../../Components/Types';
+import { CodeBlock, Description, Lesson, LessonPage, LessonPlan } from '../../Components/Types';
+import { getLessonAPI, shareLessonAPI } from '../Thunks/lessonThunk';
 
 // Define a type for the slice state
 export interface LessonPlanListState {
   lessonPlans: Array<LessonPlan>,
-  status: null,
+  status: any,
 }
 
 // Define the initial state using that type
@@ -43,8 +44,11 @@ export const lessonPlanListSlice = createSlice({
         const Lesson = {
           // Add properties for your lesson plan here
           title: action.payload.LessonTitle,
-          components: new Array<LessonPage>(),
-          // Add other properties as needed
+          username: "user",
+          sharingTime: 120,
+          codeBlocks: new Array<CodeBlock>(),
+          descriptions: new Array<Description>(),
+          numberOfPages: 1
         }
         state.lessonPlans.find((lessonPlan) => lessonPlan.title === action.payload.LessonPlanTitle)?.lessons.push(Lesson)
         return state
@@ -52,7 +56,32 @@ export const lessonPlanListSlice = createSlice({
       removeLesson (state, action) {
         return {...state, ...action.payload}
       },
+      getLesson (state, action) {
+        return {...state, code: action.payload, title: "dummy title"}
+      },
+      shareLesson (state, action) {
+        return {...state, code: action.payload, title: "dummy title"}
+      },
     },
+    extraReducers: builder => {
+      builder
+        .addCase(getLessonAPI.pending, (state, action) => {
+          state.status = 'loading'
+        })
+        .addCase(getLessonAPI.fulfilled, (state, action) => {
+          // return {...state, ...action.payload, status: 'idle'}
+          return {...state, title: action.payload.title, status: 'idle'}
+        })
+        .addCase(getLessonAPI.rejected, (state, action) => {
+          return {...state, title: 'error', status: 'idle'}
+        })
+        .addCase(shareLessonAPI.fulfilled, (state, action) => {
+          return {...state, code: action.payload.code, status: 'idle'}
+        })
+        .addCase(shareLessonAPI.rejected, (state, action) => {
+          return {...state, code: '-1', status: 'idle'}
+        })
+    }
   },
 )
 
