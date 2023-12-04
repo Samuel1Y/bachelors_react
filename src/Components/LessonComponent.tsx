@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { CodeBlock, Description, Lesson, LessonPlanProps } from './Types'
+import { CodeBlock, Description, Lesson, LessonPlanProps, Title } from './Types'
 import { Box, Typography } from '@mui/material'
 import { useAppDispatch } from '../Redux/hooks'
 import { DefaultButton } from './DefaultButton'
@@ -38,6 +38,7 @@ export const LessonComponent: React.FC<LessonPlanProps> = ({
         sharingTime: 120,
         codeBlocks: new Array<CodeBlock>(),
         descriptions: new Array<Description>(),
+        titles: new Array<Title>(),
         numberOfPages: 1
       }
       dispatch(shareLessonAPI(Lesson))

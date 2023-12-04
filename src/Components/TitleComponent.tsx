@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { setLessonPlanTitle } from "../Redux/Reducers/lessonPlansSlice";
 import { useAppDispatch } from "../Redux/hooks";
 
-export const TitleComponent: React.FC<TitleComponentProps> = ({ sx, text }) => {
+const TitleComponent: React.FC<TitleComponentProps> = ({ sx, text }) => {
 
   const [titleInput, setTitleInput] = React.useState(text)
 
@@ -17,6 +17,7 @@ export const TitleComponent: React.FC<TitleComponentProps> = ({ sx, text }) => {
   },[titleInput, dispatch]);
 
    return (
+    
     <TextField
       multiline
       maxRows={2}
@@ -42,5 +43,6 @@ export const TitleComponent: React.FC<TitleComponentProps> = ({ sx, text }) => {
     >
     </TextField>
 )}
+
 
 export default connect(null, { setLessonPlanTitle })(TitleComponent)

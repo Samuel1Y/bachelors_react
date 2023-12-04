@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from 'react'
 import { LessonPageComponentProps } from './Types'
 import { Box } from '@mui/material'
 import Draggable, { DraggableData } from 'react-draggable'
+import PageComponent from './PageComponent'
 
 export const LessonPageComponent: React.FC<LessonPageComponentProps> = ({
   sx,
@@ -128,7 +129,7 @@ export const LessonPageComponent: React.FC<LessonPageComponentProps> = ({
                 grid={[ pageRef.current?.offsetWidth!, pageRef.current?.offsetHeight!/5]}
               >
               <div key={index} className={'Component '+index} style={{maxWidth:'30rem', maxHeight:'8rem'}}>
-                  {component ? component : <div></div>}
+                  <PageComponent key={index} component={component} />
               </div>
               </Draggable>
               ))}
