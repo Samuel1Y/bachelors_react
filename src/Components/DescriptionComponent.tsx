@@ -2,7 +2,6 @@ import { TextField } from "@mui/material";
 import { DescriptionComponentProps } from "./Types";
 import React, { useEffect } from "react";
 import { connect } from "react-redux";
-import { setLessonPlanTitle } from "../Redux/Reducers/lessonPlansSlice";
 import { useAppDispatch } from "../Redux/hooks";
 
  const DescriptionComponent: React.FC<DescriptionComponentProps> = ({ sx, text, slot, pageNumber }) => {
@@ -13,7 +12,6 @@ import { useAppDispatch } from "../Redux/hooks";
 
 
   useEffect(() => {
-    dispatch(setLessonPlanTitle(''))
   },[dispatch]);
 
    return (
@@ -43,4 +41,4 @@ import { useAppDispatch } from "../Redux/hooks";
     </TextField>
 )}
 
-export default connect(null, { setLessonPlanTitle })(DescriptionComponent)
+export default connect(null, { })(DescriptionComponent)

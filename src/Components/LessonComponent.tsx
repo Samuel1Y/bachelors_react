@@ -1,12 +1,11 @@
 import React from 'react'
 
-import { CodeBlock, Description, Lesson, LessonPlanProps, Title } from './Types'
+import { CodeBlock, Description, Lesson, LessonPlan, LessonPlanProps, Title } from './Types'
 import { Box, Typography } from '@mui/material'
-import { useAppDispatch } from '../Redux/hooks'
+import { useAppDispatch, useAppSelector } from '../Redux/hooks'
 import { DefaultButton } from './DefaultButton'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { shareLessonAPI } from '../Redux/Thunks/lessonThunk'
-import { AsyncThunkAction, Dispatch, AnyAction } from '@reduxjs/toolkit'
 
 export const LessonComponent: React.FC<LessonPlanProps> = ({
   title,
@@ -14,9 +13,9 @@ export const LessonComponent: React.FC<LessonPlanProps> = ({
 }) => {
 
   const dispatch = useAppDispatch()
-
   const navigate = useNavigate() //use for navigation
   const { pathname } = useLocation()
+  const currentLessonPlan = useAppSelector((state) => state.lessonPlan.currentLessonPlan)
 
 
   const handleClick = () => {
@@ -31,18 +30,13 @@ export const LessonComponent: React.FC<LessonPlanProps> = ({
   }
 
   const handleShare = () => {
-    if (title) {
-      const Lesson: Lesson = {
-        title: title,
-        username: "user",
-        sharingTime: 120,
-        codeBlocks: new Array<CodeBlock>(),
-        descriptions: new Array<Description>(),
-        titles: new Array<Title>(),
-        numberOfPages: 1
+    if (title && currentLessonPlan) {
+      const lesson = currentLessonPlan.lessons.find((lesson: Lesson) => lesson.title === title)
+      if(lesson)
+      {
+        dispatch(shareLessonAPI(lesson))
+        console.log('Shared Lesson: '+ lesson.title)
       }
-      dispatch(shareLessonAPI(Lesson))
-      console.log(title)
     }
   }
 
@@ -72,7 +66,7 @@ return (
       }}
   >
     {title}
-  </Typography>
+    </Typography>
   <Box
     sx={{
       display:'flex',

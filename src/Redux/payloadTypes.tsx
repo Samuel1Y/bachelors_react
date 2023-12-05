@@ -7,3 +7,14 @@ export type SaveLessonPagePayload = {
   descriptions: Array<Description>
   titles: Array<Title>
 }
+
+export type GetLessonPayload = {
+  lessonId: number,
+    title: string,
+    username: string,
+    sharingCode: number,
+    sharingTime: number,
+    codeBlocks: Array<CodeBlock>,
+    descriptions: Array<Description>,
+    numberOfPages: number
+}

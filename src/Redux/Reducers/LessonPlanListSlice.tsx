@@ -2,11 +2,14 @@ import { createSlice } from '@reduxjs/toolkit'
 import type { RootState } from '../store'
 import { CodeBlock, Description, Lesson, LessonPage, LessonPlan, Title } from '../../Components/Types';
 import { getLessonAPI, shareLessonAPI } from '../Thunks/lessonThunk';
-import { SaveLessonPagePayload } from '../payloadTypes';
+import { GetLessonPayload, SaveLessonPagePayload } from '../payloadTypes';
 
 // Define a type for the slice state
 export interface LessonPlanListState {
   lessonPlans: Array<LessonPlan>,
+  lastSharedLessonCode: string,
+  lastSharedLessonTitle: string,
+  lastSharedLessonSharingTime: number,
   status: any,
 }
 
@@ -17,8 +20,11 @@ const initialState = {
     title: 'Saved Lessons',
     lessons: new Array<Lesson>(),
     // Add other properties as needed
-  }],    
-    status: null
+  }],
+  lastSharedLessonCode: 'none',
+  lastSharedLessonTitle: 'none',
+  lastSharedLessonSharingTime: -1,
+  status: null
 } as LessonPlanListState
 
 const savedState = localStorage.getItem('lessonPlanListState');
@@ -63,12 +69,10 @@ export const lessonPlanListSlice = createSlice({
       removeLesson (state, action) {
         return {...state, ...action.payload}
       },
-      getLesson (state, action) {
+      setLastSharedLessonSharingTime (state, action) {
+        state.lastSharedLessonSharingTime = action.payload
         save(state)
-        return {...state, code: action.payload, title: "dummy title"}
-      },
-      shareLesson (state, action) {
-        return {...state, code: action.payload, title: "dummy title"}
+        return state
       },
       saveLessonPage (state, action) {
         const payload: SaveLessonPagePayload = action.payload
@@ -100,14 +104,21 @@ export const lessonPlanListSlice = createSlice({
           state.status = 'loading'
         })
         .addCase(getLessonAPI.fulfilled, (state, action) => {
-          // return {...state, ...action.payload, status: 'idle'}
-          return {...state, title: action.payload.title, status: 'idle'}
+          state.lessonPlans.find((lessonPlan: LessonPlan) => lessonPlan?.title === 'Saved Lessons')?.lessons.push(action.payload)
+
+          return {...state, status: 'idle'}
         })
         .addCase(getLessonAPI.rejected, (state, action) => {
           return {...state, title: 'error', status: 'idle'}
         })
         .addCase(shareLessonAPI.fulfilled, (state, action) => {
-          return {...state, code: action.payload.code, status: 'idle'}
+          const payload: GetLessonPayload = action.payload
+          state.lastSharedLessonCode = String(payload.sharingCode)
+          state.lastSharedLessonTitle = payload.title
+          state.lastSharedLessonSharingTime = payload.sharingTime
+          state.status = 'idle'
+          save(state)
+          return state
         })
         .addCase(shareLessonAPI.rejected, (state, action) => {
           return {...state, code: '-1', status: 'idle'}
@@ -120,7 +131,7 @@ function save (state: LessonPlanListState){
   localStorage.setItem('lessonPlanListState', JSON.stringify(state));
 }
 
-export const { setLessonPlanList, addLessonPlan, removeLessonPlan, addLesson, removeLesson, saveLessonPage } = lessonPlanListSlice.actions
+export const { setLessonPlanList, addLessonPlan, removeLessonPlan, addLesson, removeLesson, saveLessonPage, setLastSharedLessonSharingTime } = lessonPlanListSlice.actions
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectLessonPlan = (state: RootState) => state.lessonPlanList

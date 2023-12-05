@@ -2,13 +2,14 @@ import { Box, TextField } from '@mui/material'
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { DefaultButton } from '../Components/DefaultButton';
-import { Subtitle } from '../Components/Text';
+import { Subtitle, Title } from '../Components/Text';
 import { useAppDispatch, useAppSelector } from '../Redux/hooks'
 import { connect } from 'react-redux';
-import { getLessonPlan, getLessonPlanAPI, setLessonPlanTitle, shareLessonPlanAPI } from '../Redux/Reducers/lessonPlansSlice';
+import { selectLessonPlan, LessonPlanState  } from '../Redux/Reducers/lessonPlanSlice';
 import { addLessonPlan, setLessonPlanList } from '../Redux/Reducers/LessonPlanListSlice';
 import { LessonPlanComponent } from '../Components/LessonPlanComponent';
 import { LessonPlan } from '../Components/Types';
+import { getLessonAPI } from '../Redux/Thunks/lessonThunk';
 
 
 function Home() {
@@ -21,8 +22,8 @@ function Home() {
     const [generatedCode, setGeneratedCode] = React.useState('')
 
     const navigate = useNavigate() //use for navigation
-    const lessonPlan = useAppSelector((state) => state.lessonPlans)
-    const lessonPlanStatus = useAppSelector((state) => state.lessonPlans.status)
+    const lessonPlan = useAppSelector((state) => state.lessonPlan)
+    const lessonPlanStatus = useAppSelector((state) => state.lessonPlan.status)
     const lessonPlanList = useAppSelector((state) => state.lessonPlanList.lessonPlans)
     const dispatch = useAppDispatch()
 
@@ -40,13 +41,10 @@ function Home() {
     }
 
     const handleRedeem = async () => {
-        await dispatch(getLessonPlanAPI(codeInput));
-            
-        dispatch(addLessonPlan(lessonPlan));
-      }
+        dispatch(getLessonAPI(codeInput));    
+    }
 
     const handleCreate = (titleInput:string) => {
-        dispatch(setLessonPlanTitle(titleInput))
         navigate('/lessonPage')
     }
 
@@ -58,15 +56,6 @@ function Home() {
     useEffect(() => {
 
     }, []);
-// mock
-    const data = [
-        {
-            title:'Saved Projects'
-        },
-        {
-            title:'custom 1'
-        },
-    ]
 
     return (
         <Box
@@ -92,22 +81,7 @@ function Home() {
                 width:'24rem',
                 overflow: 'auto'
             }}>
-            <TextField
-                label='Title'
-                type='text'
-                value={titleInput}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitleInput(e.target.value)}
-                sx={{
-                    marginY: '0.5rem'
-                }}
-            />
-            <DefaultButton label='create' onClick={() => handleCreate(titleInput)} />
-            <Subtitle text={'Generated Access Code: '+ lessonPlan.code}
-                sx={{
-                    minHeight: '5rem'
-                }}
-            />
-
+            <Title text='Enter Code' />
             <Box
                 sx={{
                     display: 'flex',
@@ -133,11 +107,6 @@ function Home() {
                     }}
                 />
             </Box>
-            <Subtitle text={'Retrieved Title: '+lessonPlan.title}
-                sx={{
-                    minHeight: '5rem'
-                }}
-            />
         </Box>
             <Box
             sx={{
@@ -206,4 +175,4 @@ function Home() {
     )
 }
 
-export default connect(null, { getLessonPlan, getLessonPlanAPI, shareLessonPlanAPI, setLessonPlanTitle, addLessonPlan })(Home)
+export default connect(null, { addLessonPlan })(Home)
