@@ -2,13 +2,12 @@ import { Box, TextField } from '@mui/material'
 import React, { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { DefaultButton } from '../Components/DefaultButton';
-import { Subtitle, Title } from '../Components/Text';
+import { Title } from '../Components/Text';
 import { useAppDispatch, useAppSelector } from '../Redux/hooks'
 import { connect } from 'react-redux';
-import { getLessonPlan, getLessonPlanAPI, setLessonPlanTitle, shareLessonPlanAPI } from '../Redux/Reducers/lessonPlansSlice';
+import { setCurrentLessonPlan } from '../Redux/Reducers/lessonPlanSlice';
 import { addLesson, addLessonPlan } from '../Redux/Reducers/LessonPlanListSlice';
-import { Lesson, LessonPlan } from '../Components/Types';
-import { LessonPlanComponent } from '../Components/LessonPlanComponent';
+import { LessonPlan } from '../Components/Types';
 import { LessonComponent } from '../Components/LessonComponent';
 
 
@@ -20,8 +19,7 @@ function LessonPlanView() {
     const navigate = useNavigate() //use for navigation
     const { pathname } = useLocation()
     const lessonPlanList = useAppSelector((state) => state.lessonPlanList.lessonPlans)
-    const [currentLessonPlan, setCurrentLessonPlan] = React.useState<LessonPlan | undefined | null>(null)
-
+    const currentLessonPlan = useAppSelector((state) => state.lessonPlan.currentLessonPlan)
 
     const dispatch = useAppDispatch()
 
@@ -37,10 +35,10 @@ function LessonPlanView() {
     useEffect(() => {
       if(pathname.split('/')[1] === 'Saved%20Lessons')
       {
-          setCurrentLessonPlan(lessonPlanList.find((lessonPlan: LessonPlan) => lessonPlan.title === 'Saved Lessons'))
+          dispatch(setCurrentLessonPlan(lessonPlanList.find((lessonPlan: LessonPlan) => lessonPlan.title === 'Saved Lessons')))
       }
-      else setCurrentLessonPlan(lessonPlanList.find((lessonPlan: LessonPlan) => lessonPlan.title === pathname.split('/')[1]))
-    }, [lessonPlanList, pathname])
+      else dispatch(setCurrentLessonPlan(lessonPlanList.find((lessonPlan: LessonPlan) => lessonPlan.title === pathname.split('/')[1])))
+    }, [dispatch, lessonPlanList, pathname])
 
 
     return (
@@ -138,4 +136,4 @@ function LessonPlanView() {
     )
 }
 
-export default connect(null, { getLessonPlan, getLessonPlanAPI, shareLessonPlanAPI, setLessonPlanTitle, addLessonPlan, addLesson })(LessonPlanView)
+export default connect(null, { addLessonPlan, addLesson, setCurrentLessonPlan })(LessonPlanView)

@@ -3,7 +3,6 @@ import React, { useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../Redux/hooks'
 import { connect } from 'react-redux'
-import { getLessonPlan, getLessonPlanAPI, shareLessonPlanAPI } from '../Redux/Reducers/lessonPlansSlice'
 import { LessonPageComponent } from '../Components/LessonPageComponent'
 import { DefaultButton } from '../Components/DefaultButton'
 import TitleComponent from '../Components/TitleComponent'
@@ -19,7 +18,6 @@ function LessonPage() {
     
     const navigate = useNavigate() //use for navigation
     const { pathname } = useLocation()
-    const lessonPlan = useAppSelector((state) => state.lessonPlans)
     const lessonPlanList = useAppSelector((state) => state.lessonPlanList.lessonPlans)
 
     const dispatch = useAppDispatch()
@@ -238,4 +236,4 @@ function LessonPage() {
     )
 }
 
-export default connect(null, { getLessonPlan, getLessonPlanAPI, shareLessonPlanAPI, addLessonPlan, saveLessonPage })(LessonPage)
+export default connect(null, { addLessonPlan, saveLessonPage })(LessonPage)

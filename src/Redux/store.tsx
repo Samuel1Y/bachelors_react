@@ -1,12 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit'
-import lessonPlansReducer from './Reducers/lessonPlansSlice'
+import lessonPlanReducer from './Reducers/lessonPlanSlice'
 import lessonPlanListReducer from './Reducers/LessonPlanListSlice'
 // ...
 
 const store = configureStore({
   reducer: {
     lessonPlanList: lessonPlanListReducer,
-    lessonPlans: lessonPlansReducer,
+    lessonPlan: lessonPlanReducer,
   },
 })
 export default store

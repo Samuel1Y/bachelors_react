@@ -2,7 +2,6 @@ import { Box, TextField } from "@mui/material";
 import { TitleComponentProps } from "./Types";
 import React, { useEffect } from "react";
 import { connect } from "react-redux";
-import { setLessonPlanTitle } from "../Redux/Reducers/lessonPlansSlice";
 import { useAppDispatch } from "../Redux/hooks";
 
 const TitleComponent: React.FC<TitleComponentProps> = ({ sx, text }) => {
@@ -13,7 +12,6 @@ const TitleComponent: React.FC<TitleComponentProps> = ({ sx, text }) => {
 
 
   useEffect(() => {
-    dispatch(setLessonPlanTitle(titleInput))
   },[titleInput, dispatch]);
 
    return (
@@ -45,4 +43,4 @@ const TitleComponent: React.FC<TitleComponentProps> = ({ sx, text }) => {
 )}
 
 
-export default connect(null, { setLessonPlanTitle })(TitleComponent)
+export default connect(null, { })(TitleComponent)
