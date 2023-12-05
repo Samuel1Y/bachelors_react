@@ -16,14 +16,35 @@ export type ButtonProps = {
   }
 
   export type TitleComponentProps = {
+    type: 'TitleComponent',
     text?: string,
+    slot?: number
+    pageNumber?: number 
     sx?: object,
   }
 
   export type DescriptionComponentProps = {
+    type: 'DescriptionComponent',
     text?: string,
+    slot?: number,
+    pageNumber?: number ,
     sx?: object,
   }
+
+  export type CodeBlockComponentProps = {
+    type: 'CodeBlockComponent',
+    codeBlockId?: number,
+    slot?: number,
+    pageNumber?: number,
+    jsonBlocks?: string,
+  }
+
+  export type PageComponent = TitleComponentProps | DescriptionComponentProps | CodeBlockComponentProps
+
+  export type PageComponentProps = {
+    component: PageComponent
+  }
+
 
   export type LessonPlanProps = {
     title?: string,
@@ -36,7 +57,7 @@ export type ButtonProps = {
   }
 
   export type LessonPageComponentProps = {
-    components: Array<any>,
+    components: Array<PageComponent>,
     sx?: object,
   }
 //objects------------------------
@@ -52,12 +73,14 @@ export type ButtonProps = {
     sharingTime: number //sharing time in minutes
     codeBlocks: Array<CodeBlock>
     descriptions: Array<Description>
+    titles: Array<Title>
     numberOfPages: number
   }
 
+
   //to delete
   export type LessonPage = {
-    components: Array<any>,
+    components: Array<PageComponent>,
     sx?: object,
   }
 
@@ -70,6 +93,13 @@ export type ButtonProps = {
 
   export type Description = {
     descriptionId: number
+    slot: number
+    pageNumber: number 
+    text: string
+  }
+
+  export type Title = {
+    titleId: number
     slot: number
     pageNumber: number 
     text: string

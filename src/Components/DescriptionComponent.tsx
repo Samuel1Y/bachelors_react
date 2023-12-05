@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { setLessonPlanTitle } from "../Redux/Reducers/lessonPlansSlice";
 import { useAppDispatch } from "../Redux/hooks";
 
-export const DescriptionComponent: React.FC<DescriptionComponentProps> = ({ sx, text }) => {
+ const DescriptionComponent: React.FC<DescriptionComponentProps> = ({ sx, text, slot, pageNumber }) => {
 
   const [descriptionInput, setDescriptionInput] = React.useState(text)
 

@@ -1,7 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { RootState } from '../store'
-import { CodeBlock, Description, Lesson, LessonPage, LessonPlan } from '../../Components/Types';
+import { CodeBlock, Description, Lesson, LessonPage, LessonPlan, Title } from '../../Components/Types';
 import { getLessonAPI, shareLessonAPI } from '../Thunks/lessonThunk';
+import { SaveLessonPagePayload } from '../payloadTypes';
 
 // Define a type for the slice state
 export interface LessonPlanListState {
@@ -21,7 +22,7 @@ const initialState = {
 } as LessonPlanListState
 
 const savedState = localStorage.getItem('lessonPlanListState');
-const parsedState = savedState ? JSON.parse(savedState) : initialState;
+const parsedState = savedState ? JSON.parse(savedState) as LessonPlanListState : initialState
 
 export const lessonPlanListSlice = createSlice({
   name: 'lessonPlanList',
@@ -52,6 +53,7 @@ export const lessonPlanListSlice = createSlice({
           sharingTime: 120,
           codeBlocks: new Array<CodeBlock>(),
           descriptions: new Array<Description>(),
+          titles: new Array<Title>(),
           numberOfPages: 1, 
         }
         state.lessonPlans.find((lessonPlan: LessonPlan) => lessonPlan.title === action.payload.LessonPlanTitle)?.lessons.push(Lesson)
@@ -67,6 +69,29 @@ export const lessonPlanListSlice = createSlice({
       },
       shareLesson (state, action) {
         return {...state, code: action.payload, title: "dummy title"}
+      },
+      saveLessonPage (state, action) {
+        const payload: SaveLessonPagePayload = action.payload
+        let lesson = state.lessonPlans.find((lessonPlan: LessonPlan) => lessonPlan?.title === payload.lessonPlanTitle)?.lessons.find((lesson: Lesson) => lesson?.title === payload.lessonTitle)
+
+        console.log(lesson)
+
+        payload.titles.forEach((component) => {
+          console.log(component)
+          state.lessonPlans.find((lessonPlan: LessonPlan) => lessonPlan?.title === payload.lessonPlanTitle)?.lessons.find((lesson: Lesson) => lesson?.title === payload.lessonTitle)?.titles.push(component)
+        });
+        payload.descriptions.forEach((component) => {
+          console.log(component)
+          state.lessonPlans.find((lessonPlan: LessonPlan) => lessonPlan.title === payload.lessonPlanTitle)?.lessons.find((lesson: Lesson) => lesson.title === payload.lessonTitle)?.descriptions.push(component)
+        });
+        payload.codeBlocks.forEach((component) => {
+          console.log(component)
+          state.lessonPlans.find((lessonPlan: LessonPlan) => lessonPlan.title === payload.lessonPlanTitle)?.lessons.find((lesson: Lesson) => lesson.title === payload.lessonTitle)?.codeBlocks.push(component)
+        });
+        
+
+        save(state)
+        return state
       },
     },
     extraReducers: builder => {
@@ -95,7 +120,7 @@ function save (state: LessonPlanListState){
   localStorage.setItem('lessonPlanListState', JSON.stringify(state));
 }
 
-export const { setLessonPlanList, addLessonPlan, removeLessonPlan, addLesson, removeLesson } = lessonPlanListSlice.actions
+export const { setLessonPlanList, addLessonPlan, removeLessonPlan, addLesson, removeLesson, saveLessonPage } = lessonPlanListSlice.actions
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectLessonPlan = (state: RootState) => state.lessonPlanList
