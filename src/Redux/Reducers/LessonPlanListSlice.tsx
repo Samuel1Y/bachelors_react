@@ -104,9 +104,8 @@ export const lessonPlanListSlice = createSlice({
           state.status = 'loading'
         })
         .addCase(getLessonAPI.fulfilled, (state, action) => {
-          state.lessonPlans.find((lessonPlan: LessonPlan) => lessonPlan?.title === 'Saved Lessons')?.lessons.push(action.payload)
-
-          return {...state, status: 'idle'}
+          state.lessonPlans.find((lessonPlan: LessonPlan) => lessonPlan.title === 'Saved Lessons')?.lessons.push(action.payload as Lesson)
+          save(state)
         })
         .addCase(getLessonAPI.rejected, (state, action) => {
           return {...state, title: 'error', status: 'idle'}

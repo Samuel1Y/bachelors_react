@@ -1,6 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { Lesson} from '../../Components/Types';
+import { Lesson, Title} from '../../Components/Types';
 import axios from 'axios';
+import { RootState } from '../store';
+import { useSelector } from 'react-redux';
+
+
 
 //Thunk functions, API
 const BASE_API_URL = 'https://api-bachelor.azurewebsites.net/api'
@@ -9,16 +13,32 @@ export const getLessonAPI = createAsyncThunk('lessonPlanList/getLessonAPI', asyn
 
   const response = await axios.get(`${BASE_API_URL}/Lesson/code/${code}`)
   try{
-    const data = await response.data
-    return data
+      var lesson: Lesson = {
+          codeBlocks: response.data.codeBlocks,
+          descriptions: response.data.descriptions,
+          titles: new Array<Title>(),
+          username: response.data.username,
+          sharingTime: response.data.sharingTime,
+          title: response.data.title,
+          numberOfPages: response.data.numberOfPages,
+      }
+        return lesson
   } catch (error) {
       throw new Error('Error fetching Lesson')
   }
 });
 
-// send title of the lesson, API will return access code that belongs to the sent lesson plan
-export const shareLessonAPI = createAsyncThunk('lessonPlanList/shareLessonAPI', async (lesson: Lesson) => {
-  const response = await axios.post(`${BASE_API_URL}/Lesson`, lesson)
+
+export const shareLessonAPI = createAsyncThunk('lessonPlanList/shareLessonAPI', async (lesson: Lesson, { getState }) => { // Add { getState } as a parameter
+  const state = getState() as RootState;
+  const authToken = state.teacher.teacher.token;
+
+  const response = await axios.post(`${BASE_API_URL}/Lesson`, lesson, {
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+  });
+  
   try {
     console.log(response.statusText)
     if (response.status === 201) {
