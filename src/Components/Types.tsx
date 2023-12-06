@@ -104,3 +104,8 @@ export type ButtonProps = {
     pageNumber: number 
     text: string
   }
+
+  export type Teacher = {
+    username: string
+    token: string 
+  }
