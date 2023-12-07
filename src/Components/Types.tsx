@@ -45,6 +45,11 @@ export type ButtonProps = {
     component: PageComponent
   }
 
+  export type LessonPopUpProps = {
+    lesson: Lesson,
+    onOpen?: (() => void) | ((event: React.MouseEvent<HTMLElement>) => void),
+    onClose?: (() => void) | ((event: React.MouseEvent<HTMLElement>) => void),
+  }
 
   export type LessonPlanProps = {
     title?: string,

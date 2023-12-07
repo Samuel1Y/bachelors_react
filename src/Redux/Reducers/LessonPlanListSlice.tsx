@@ -10,6 +10,7 @@ export interface LessonPlanListState {
   lastSharedLessonCode: string,
   lastSharedLessonTitle: string,
   lastSharedLessonSharingTime: number,
+  lastRedeemedLesson: Lesson | null,
   status: any,
 }
 
@@ -24,7 +25,8 @@ const initialState = {
   lastSharedLessonCode: 'none',
   lastSharedLessonTitle: 'none',
   lastSharedLessonSharingTime: -1,
-  status: null
+  lastRedeemedLesson: null,
+  status: 'idle'
 } as LessonPlanListState
 
 const savedState = localStorage.getItem('lessonPlanListState');
@@ -52,7 +54,7 @@ export const lessonPlanListSlice = createSlice({
         return {...state, ...action.payload}
       },
       addLesson (state, action) {
-        const Lesson = {
+        const lesson = {
           // Add properties for your lesson plan here
           title: action.payload.LessonTitle,
           username: "user",
@@ -62,7 +64,12 @@ export const lessonPlanListSlice = createSlice({
           titles: new Array<Title>(),
           numberOfPages: 1, 
         }
-        state.lessonPlans.find((lessonPlan: LessonPlan) => lessonPlan.title === action.payload.LessonPlanTitle)?.lessons.push(Lesson)
+        state.lessonPlans.find((lessonPlan: LessonPlan) => lessonPlan.title === action.payload.LessonPlanTitle)?.lessons.push(lesson)
+        save(state)
+        return state
+      },
+      addRedeemedLesson (state, action) {
+        state.lessonPlans.find((lessonPlan: LessonPlan) => lessonPlan.title === 'Saved Lessons')?.lessons.push(action.payload as Lesson)
         save(state)
         return state
       },
@@ -76,9 +83,6 @@ export const lessonPlanListSlice = createSlice({
       },
       saveLessonPage (state, action) {
         const payload: SaveLessonPagePayload = action.payload
-        let lesson = state.lessonPlans.find((lessonPlan: LessonPlan) => lessonPlan?.title === payload.lessonPlanTitle)?.lessons.find((lesson: Lesson) => lesson?.title === payload.lessonTitle)
-
-        console.log(lesson)
 
         payload.titles.forEach((component) => {
           console.log(component)
@@ -101,14 +105,21 @@ export const lessonPlanListSlice = createSlice({
     extraReducers: builder => {
       builder
         .addCase(getLessonAPI.pending, (state, action) => {
+          state.lastRedeemedLesson = null
           state.status = 'loading'
+          return state
         })
         .addCase(getLessonAPI.fulfilled, (state, action) => {
-          state.lessonPlans.find((lessonPlan: LessonPlan) => lessonPlan.title === 'Saved Lessons')?.lessons.push(action.payload as Lesson)
+          state.lastRedeemedLesson = action.payload as Lesson
+          state.status = 'idle'
           save(state)
+          return state
         })
         .addCase(getLessonAPI.rejected, (state, action) => {
-          return {...state, title: 'error', status: 'idle'}
+          return {...state, lastRedeemedLesson: null, status: 'idle'}
+        })
+        .addCase(shareLessonAPI.pending, (state, action) => {
+          return {...state, status: 'loading'}
         })
         .addCase(shareLessonAPI.fulfilled, (state, action) => {
           const payload: GetLessonPayload = action.payload
@@ -130,7 +141,7 @@ function save (state: LessonPlanListState){
   localStorage.setItem('lessonPlanListState', JSON.stringify(state));
 }
 
-export const { setLessonPlanList, addLessonPlan, removeLessonPlan, addLesson, removeLesson, saveLessonPage, setLastSharedLessonSharingTime } = lessonPlanListSlice.actions
+export const { setLessonPlanList, addLessonPlan, removeLessonPlan, addLesson, addRedeemedLesson, removeLesson, saveLessonPage, setLastSharedLessonSharingTime } = lessonPlanListSlice.actions
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectLessonPlan = (state: RootState) => state.lessonPlanList

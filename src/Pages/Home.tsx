@@ -1,4 +1,4 @@
-import { Box, TextField } from '@mui/material'
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material'
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { DefaultButton } from '../Components/DefaultButton';
@@ -6,7 +6,7 @@ import { Subtitle, Title } from '../Components/Text';
 import { useAppDispatch, useAppSelector } from '../Redux/hooks'
 import { connect } from 'react-redux';
 import { selectLessonPlan, LessonPlanState  } from '../Redux/Reducers/lessonPlanSlice';
-import { addLessonPlan, setLessonPlanList } from '../Redux/Reducers/LessonPlanListSlice';
+import { addLessonPlan, addRedeemedLesson, setLessonPlanList } from '../Redux/Reducers/LessonPlanListSlice';
 import { LessonPlanComponent } from '../Components/LessonPlanComponent';
 import { LessonPlan } from '../Components/Types';
 import { getLessonAPI } from '../Redux/Thunks/lessonThunk';
@@ -23,34 +23,35 @@ function Home() {
 
     const navigate = useNavigate() //use for navigation
     const lessonPlan = useAppSelector((state) => state.lessonPlan)
-    const lessonPlanStatus = useAppSelector((state) => state.lessonPlan.status)
+    const lessonPlanListStatus = useAppSelector((state) => state.lessonPlanList.status)
     const lessonPlanList = useAppSelector((state) => state.lessonPlanList.lessonPlans)
+    const redeemedLesson = useAppSelector((state) => state.lessonPlanList.lastRedeemedLesson)
     const dispatch = useAppDispatch()
 
-    const generateCode = (length: number) => {
-        let code = ''
-        /* generating random code
-        for (let index = 0; index < length; index++) {
-            code += Math.floor(Math.random() * (9 - 0 + 1)); //random number from 0-9
-
-        }
-        */
-        console.log(code)
-        setGeneratedCode(code)
-        return code
-    }
-
     const handleRedeem = async () => {
-        dispatch(getLessonAPI(codeInput));    
-    }
-
-    const handleCreate = (titleInput:string) => {
-        navigate('/lessonPage')
+        await dispatch(getLessonAPI(codeInput)) 
+        handleClickOpen()  
     }
 
     const handleCreateLessonPlan = (LessonPlanTitleInput:string) => {
         dispatch(addLessonPlan(LessonPlanTitleInput))
         //setLessonPlanTitleInput('')
+    }
+
+    // pop up
+    const [open, setOpen] = React.useState(false);
+
+    const handleClickOpen = () => {
+        setOpen(true)
+    }
+
+    const handleClose = () => {
+        setOpen(false)
+    }
+
+    const handleAddLesson = () => {
+        dispatch(addRedeemedLesson(redeemedLesson))
+        handleClose()
     }
 
     useEffect(() => {
@@ -100,6 +101,7 @@ function Home() {
                 />
                 <DefaultButton
                     label='redeem'
+                    disabled={lessonPlanListStatus !== 'idle'}
                     onClick={handleRedeem}
                     sx={{
                         height: 'auto',
@@ -150,8 +152,7 @@ function Home() {
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLessonPlanTitleInput(e.target.value)}
                     sx={{
                         height: '3rem',
-                    }}
-                />
+                    }}/>
                 <DefaultButton label='Add' 
                 onClick={(e) => {
                 e.stopPropagation(); // Prevent the click event from reaching the parent div
@@ -171,8 +172,45 @@ function Home() {
                     }} />
             </div>
     </Box>
+    <React.Fragment>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        {redeemedLesson ? <>
+            <DialogTitle id="alert-dialog-title">
+          {`${redeemedLesson.title}`}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {`Do you wish to add this lesson in your saved lessons?`}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleAddLesson} autoFocus>Add Lesson</Button>
+        </DialogActions>
+        </> : <>
+        <DialogTitle id="alert-dialog-title">
+          {`No lesson found`}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {`Redeemed access code is wrong or expired`}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Close</Button>
+        </DialogActions>
+        </>}
+        
+      </Dialog>
+    </React.Fragment>
     </Box>
+    
     )
 }
 
-export default connect(null, { addLessonPlan })(Home)
+export default connect(null, { addLessonPlan, addRedeemedLesson })(Home)
