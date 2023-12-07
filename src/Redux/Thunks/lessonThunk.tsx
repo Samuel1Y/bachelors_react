@@ -31,7 +31,7 @@ export const getLessonAPI = createAsyncThunk('lessonPlanList/getLessonAPI', asyn
 
 export const shareLessonAPI = createAsyncThunk('lessonPlanList/shareLessonAPI', async (lesson: Lesson, { getState }) => { // Add { getState } as a parameter
   const state = getState() as RootState;
-  const authToken = state.teacher.teacher.token;
+  const authToken = state.teacher.teacher?.token || ''
 
   const response = await axios.post(`${BASE_API_URL}/Lesson`, lesson, {
     headers: {

@@ -152,8 +152,7 @@ function Home() {
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLessonPlanTitleInput(e.target.value)}
                     sx={{
                         height: '3rem',
-                    }}
-                />
+                    }}/>
                 <DefaultButton label='Add' 
                 onClick={(e) => {
                 e.stopPropagation(); // Prevent the click event from reaching the parent div

@@ -3,8 +3,8 @@ import { Teacher } from '../../Components/Types';
 import { loginTeacherAPI } from '../Thunks/TeacherThunk';
 
 // Define a type for the slice state
-export interface TeacherSlice {
-  teacher: Teacher,
+export interface TeacherSliceState {
+  teacher: Teacher | null,
   isLoggedIn: boolean,
   status: any,
 }
@@ -16,11 +16,11 @@ const initialState = {
         token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZWFjaGVyMSIsIm5iZiI6MTcwMTg2MDYyNiwiZXhwIjoxNzAxOTAzODI2LCJpYXQiOjE3MDE4NjA2MjYsImlzcyI6IkJhY2hlbG9yX2FwcCIsImF1ZCI6IkJhY2hlbG9yX2FwcCJ9.3rtxnBM8yp9dEZwOW_cFv5rXCh-n8tPWsbAhD2r6ZYk',
     },
     isLoggedIn: true,
-    status: null
-} as TeacherSlice
+    status: 'idle'
+} as TeacherSliceState
 
 const savedState = localStorage.getItem('teacherState');
-const parsedState = savedState ? JSON.parse(savedState) as TeacherSlice : initialState
+const parsedState = savedState ? JSON.parse(savedState) as TeacherSliceState : initialState
 
 export const TeacherSlice = createSlice({
   name: 'teacher',
@@ -28,7 +28,14 @@ export const TeacherSlice = createSlice({
   reducers: {
       login (state, action) {
         return {...state, ...action.payload}
-      }
+      },
+      logOut (state) {
+        state.teacher = null
+        state.isLoggedIn = false
+        //uncomment save state after testing
+        //save(state)
+        return state
+      },
     },
     extraReducers: builder => {
       builder
@@ -49,10 +56,10 @@ export const TeacherSlice = createSlice({
   },
 )
 
-function save (state: TeacherSlice){
+function save (state: TeacherSliceState){
   localStorage.setItem('teacherState', JSON.stringify(state));
 }
 
-export const { login } = TeacherSlice.actions
+export const { login, logOut } = TeacherSlice.actions
 
 export default TeacherSlice.reducer
