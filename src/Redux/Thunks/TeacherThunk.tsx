@@ -14,7 +14,7 @@ export const loginTeacherAPI = createAsyncThunk('teacher/loginTeacherAPI', async
     const response = await axios.post(`${BASE_API_URL}/Teacher/Login`, requestBody)
     try {
         console.log(response.statusText)
-        if (response.status === 201) {
+        if (response.status === 200) {
             if (response.data.isEmpty) {
                 return ('Wrong login credentials');
             } else {

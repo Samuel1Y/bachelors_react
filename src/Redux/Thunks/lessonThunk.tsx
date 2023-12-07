@@ -16,7 +16,7 @@ export const getLessonAPI = createAsyncThunk('lessonPlanList/getLessonAPI', asyn
       var lesson: Lesson = {
           codeBlocks: response.data.codeBlocks,
           descriptions: response.data.descriptions,
-          titles: new Array<Title>(),
+          titles: response.data.titles,
           username: response.data.username,
           sharingTime: response.data.sharingTime,
           title: response.data.title,
