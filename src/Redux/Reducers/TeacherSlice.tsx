@@ -36,13 +36,14 @@ export const TeacherSlice = createSlice({
           state.status = 'loading'
         })
         .addCase(loginTeacherAPI.fulfilled, (state, action) => {
-            state.teacher = action.payload as Teacher; 
-            state.isLoggedIn = true;
-            save(state);
-            return {...state, status: 'idle'};
+            state.teacher = action.payload as Teacher 
+            state.isLoggedIn = true
+            state.status = 'idle'
+            save(state)
+            return state
         })
         .addCase(loginTeacherAPI.rejected, (state, action) => {
-          return {...state, title: 'error', status: 'idle'}
+          return {...state, status: 'idle'}
         })
     }
   },

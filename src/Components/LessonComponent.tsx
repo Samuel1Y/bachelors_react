@@ -16,6 +16,8 @@ export const LessonComponent: React.FC<LessonPlanProps> = ({
   const navigate = useNavigate() //use for navigation
   const { pathname } = useLocation()
   const currentLessonPlan = useAppSelector((state) => state.lessonPlan.currentLessonPlan)
+  const status = useAppSelector((state) => state.lessonPlanList.status)
+
 
 
   const handleClick = () => {
@@ -76,6 +78,7 @@ return (
 
     }}>
   <DefaultButton label='Share' 
+    disabled={status !== 'idle'}
     onClick={(e) => {
       e.stopPropagation(); // Prevent the click event from reaching the parent div
       handleShare();

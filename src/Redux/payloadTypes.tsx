@@ -16,5 +16,6 @@ export type GetLessonPayload = {
     sharingTime: number,
     codeBlocks: Array<CodeBlock>,
     descriptions: Array<Description>,
+    titles: Array<Title>,
     numberOfPages: number
 }
