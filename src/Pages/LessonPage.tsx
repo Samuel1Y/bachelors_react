@@ -140,7 +140,10 @@ function LessonPage() {
         const slot = pageComponents.length + 1
         let pageNumber = 1
 
-        if(pageComponents.length < 5)
+        const componentInSlot = pageComponents.find((component: PageComponent) => component.slot === slot)
+        console.log(componentInSlot)
+        console.log(pageComponents.length)
+        if(pageComponents.length < 5 && componentInSlot === undefined)
         {
             setPageComponents((prevComponents) => [...prevComponents, {...newComponent, slot, pageNumber }]);
         }
@@ -148,7 +151,7 @@ function LessonPage() {
             console.log('no more free slots on this page')
             pageNumber++
         }
-      };
+      }
 
     useEffect(() => {
         if(lessonPlanList.length > 0)
