@@ -83,26 +83,11 @@ export const lessonPlanListSlice = createSlice({
       },
       saveLessonPage (state, action) {
         const payload: SaveLessonPagePayload = action.payload
-/*
-        payload.titles.forEach((component) => {
-          console.log(component)
-          state.lessonPlans.find((lessonPlan: LessonPlan) => lessonPlan?.title === payload.lessonPlanTitle)?.lessons.find((lesson: Lesson) => lesson?.title === payload.lessonTitle)?.titles.push(component)
-        });
 
-        payload.descriptions.forEach((component) => {
-          console.log(component)
-          state.lessonPlans.find((lessonPlan: LessonPlan) => lessonPlan.title === payload.lessonPlanTitle)?.lessons.find((lesson: Lesson) => lesson.title === payload.lessonTitle)?.descriptions.push(component)
-        });
-        payload.codeBlocks.forEach((component) => {
-          console.log(component)
-          state.lessonPlans.find((lessonPlan: LessonPlan) => lessonPlan.title === payload.lessonPlanTitle)?.lessons.find((lesson: Lesson) => lesson.title === payload.lessonTitle)?.codeBlocks.push(component)
-        });
-        */
         state.lessonPlans.find((lessonPlan: LessonPlan) => lessonPlan.title === payload.lessonPlanTitle)!.lessons.find((lesson: Lesson) => lesson.title === payload.lessonTitle)!.titles = payload.titles
         state.lessonPlans.find((lessonPlan: LessonPlan) => lessonPlan.title === payload.lessonPlanTitle)!.lessons.find((lesson: Lesson) => lesson.title === payload.lessonTitle)!.descriptions = payload.descriptions
         state.lessonPlans.find((lessonPlan: LessonPlan) => lessonPlan.title === payload.lessonPlanTitle)!.lessons.find((lesson: Lesson) => lesson.title === payload.lessonTitle)!.codeBlocks = payload.codeBlocks
-
-
+        state.lessonPlans.find((lessonPlan: LessonPlan) => lessonPlan.title === payload.lessonPlanTitle)!.lessons.find((lesson: Lesson) => lesson.title === payload.lessonTitle)!.numberOfPages = payload.numberOfPages
         save(state)
         return state
       },
