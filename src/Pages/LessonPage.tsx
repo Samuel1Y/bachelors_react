@@ -29,66 +29,97 @@ function LessonPage() {
     //    lessonPlanList.find((lessonPlan) => lessonPlan.title === pathname.split('/')[1])
     //    .lessons.find((lesson) => lesson.title === pathname.split('/')[2]).
 
-    const [pageComponents, setPageComponents] = React.useState(Array<PageComponent>())
+    const [lessonPages, setLessonPages] = React.useState<Array<Array<PageComponent>>>(() => {
+      const initialPage: Array<PageComponent> = [];
+      return [initialPage];
+  });
+  // State to manage the current page index
+  const [currentPageIndex, setCurrentPageIndex] = React.useState<number>(0);
+
+  const addPage = () => {
+    const newPage: Array<PageComponent> = []
+    const pages = lessonPages
+    pages.push(newPage)
+    setLessonPages(pages)
+    setCurrentPageIndex(lessonPages.length-1)
+
+  }
 
     const createPageComponents = () => {
-        const lessonPlanTitle = pathname.split('/')[1]
-        const lessonTitle = pathname.split('/')[2]
-        const lesson = lessonPlanList.find((lessonPlan: LessonPlan) => lessonPlan.title === lessonPlanTitle)?.lessons.find((lesson: Lesson) => lesson.title === lessonTitle)
+      const lessonPlanTitle = pathname.split('/')[1];
+      const lessonTitle = pathname.split('/')[2];
+      const lesson = lessonPlanList
+        .find((lessonPlan: LessonPlan) => lessonPlan.title === lessonPlanTitle)
+        ?.lessons.find((lesson: Lesson) => lesson.title === lessonTitle)
+    
+      if (lesson !== undefined) {
+        // Initialize array with null values for each page
+        const allComponents: Array<Array<PageComponent | null>> = new Array(lesson.numberOfPages)
+          .fill(null)
+          .map(() => new Array(5).fill(null))
+        // Add component to the array at the specified index for each page
+        const addComponent = (component: PageComponent, pageIndex: number) => {
+          if (component.slot !== undefined) {
+            const index = component.slot - 1;
+            allComponents[pageIndex][index] = component;
+          }
+        };
 
-        if(lesson !== undefined)
-        {
-        const { codeBlocks, descriptions, titles } = lesson
-
-      
-        // Initialize array with null values
-        const allComponents: Array<PageComponent | null> = new Array(5).fill(null);
-      
-        //add component to the array at the specified index
-        const addComponent = (component: PageComponent) => {
-            if(component.slot !== undefined)
-            {
-                const index = component.slot - 1;
-                allComponents[index] = component;
-            }
+        // Iterate over each page
+        for (let pageIndex = 0; pageIndex < lesson.numberOfPages; pageIndex++) {
+          let codeBlocks = lesson.codeBlocks.filter((codeBlock) => codeBlock.pageNumber === pageIndex + 1);
+          let descriptions = lesson.descriptions.filter((description) => description.pageNumber === pageIndex + 1);
+          let titles = lesson.titles.filter((title) => title.pageNumber === pageIndex + 1);
+    
+          // Add codeBlocks to the array for the current page
+          codeBlocks.forEach((codeBlock, index) => {
+            addComponent(
+              {
+                type: 'CodeBlockComponent',
+                codeBlockId: index + 1,
+                slot: codeBlock.slot,
+                pageNumber: codeBlock.pageNumber,
+                jsonBlocks: codeBlock.jsonBlocks,
+              },
+              pageIndex
+            );
+          });
+    
+          // Add descriptions to the array for the current page
+          descriptions.forEach((description, index) => {
+            addComponent(
+              {
+                type: 'DescriptionComponent',
+                text: description.text,
+                slot: description.slot,
+                pageNumber: description.pageNumber,
+              },
+              pageIndex
+            );
+          });
+    
+          // Add titles to the array for the current page
+          titles.forEach((title, index) => {
+            addComponent(
+              {
+                type: 'TitleComponent',
+                text: title.text,
+                slot: title.slot,
+                pageNumber: title.pageNumber,
+              },
+              pageIndex
+            );
+          });
         }
-      
-        // Add codeBlocks to the array
-        codeBlocks.forEach((codeBlock, index) => {
-          addComponent({
-            type: 'CodeBlockComponent',
-            codeBlockId: index + 1,
-            slot: codeBlock.slot,
-            pageNumber: codeBlock.pageNumber,
-            jsonBlocks: codeBlock.jsonBlocks,
-          })
-        })
-      
-        // Add descriptions to the array
-        descriptions.forEach((description, index) => {
-          addComponent({
-            type: 'DescriptionComponent',
-            text: description.text,
-            slot: description.slot,
-            pageNumber: description.pageNumber,
-          })
-        })
-      
-        // Add titles to the array
-        titles.forEach((title, index) => {
-          addComponent({
-            type: 'TitleComponent',
-            text: title.text,
-            slot: title.slot,
-            pageNumber: title.pageNumber,
-          })
-        })
-        // Remove null values from the array
-        const result = allComponents.filter((component) => component !== null) as Array<PageComponent>;
-      
-        setPageComponents(result)
-    }
+    
+        // Remove null values from the array for each page
+        const result = allComponents.map((pageComponents) =>
+          pageComponents.filter((component) => component !== null) as Array<PageComponent>
+        )
+  
+        setLessonPages(result)
       }
+    }
 
     const eventHandler = (e:any, data:any) => {
       console.log('Event Type', e.type);
@@ -101,73 +132,72 @@ function LessonPage() {
             lessonTitle: pathname.split('/')[2],
             titles: [],
             descriptions: [],
-            codeBlocks: []
+            codeBlocks: [],
+            numberOfPages: -1
         } as SaveLessonPagePayload
 
-        pageComponents.forEach((component, index) => {
+        lessonPages.forEach((page, pageIndex) => {
+          page.forEach((component) => {
             switch (component.type) {
               case 'TitleComponent':
-                const title: TitleType = {
+                payload.titles.push({
                   titleId: 0,
                   slot: component.slot || -1,
-                  pageNumber: component.pageNumber || -1,
-                  text: component.text || 'no text'
-                }
-                //lesson.titles.push(title)
-                payload.titles.push(title as TitleType)
-                break
-                case 'DescriptionComponent':
-                const description: Description = {
+                  pageNumber: pageIndex + 1,
+                  text: component.text || 'no text',
+                });
+                break;
+              case 'DescriptionComponent':
+                payload.descriptions.push({
                   descriptionId: 0,
                   slot: component.slot || -1,
-                  pageNumber: component.pageNumber || -1,
-                  text: component.text || 'no text'
-                }
-                payload.descriptions.push(description as Description)
-                break
+                  pageNumber: pageIndex + 1,
+                  text: component.text || 'no text',
+                });
+                break;
               case 'CodeBlockComponent':
-                //Implement
-                break
+                payload.codeBlocks.push({
+                  codeBlockId: 0,
+                  slot: component.slot || -1,
+                  pageNumber: pageIndex + 1,
+                  jsonBlocks: component.jsonBlocks || 'no jsonBlocks',
+                });
+                break;
+              // Handle other component types as needed
               default:
                 console.log(`Unknown component type: ${component}`);
             }
           });
+          payload.numberOfPages = pageIndex+1
+        });
          dispatch(saveLessonPage(payload))
         navigate('/'+pathname.split('/')[0]+ pathname.split('/')[1])
     }
 
     const handleAddComponent = (newComponent: PageComponent) => {
-        const slot = pageComponents.length + 1
-        let pageNumber = 1
-
-        const componentInSlot = pageComponents.find((component: PageComponent) => component.slot === slot)
-        console.log(componentInSlot)
-        console.log(pageComponents.length)
-        if(pageComponents.length < 5 && componentInSlot === undefined)
-        {
-            setPageComponents((prevComponents) => [...prevComponents, {...newComponent, slot, pageNumber }]);
-        }
-        else {
-            console.log('no more free slots on this page')
-            pageNumber++
-        }
+      const slot = lessonPages[currentPageIndex].length + 1;
+      const pageNumber = 1;
+  
+      if (lessonPages[currentPageIndex].length < 5) {
+        setLessonPages((prevPages) => {
+          const updatedPages = [...prevPages];
+          updatedPages[currentPageIndex] = [
+            ...updatedPages[currentPageIndex],
+            { ...newComponent, slot, pageNumber },
+          ];
+          return updatedPages;
+        });
+      } else {
+        console.log('No more free slots on this page');
+      }
       }
 
     useEffect(() => {
         if(lessonPlanList.length > 0)
         {
-            createPageComponents()
+          createPageComponents()
         }
     }, []);
-
-    /*let components = 
-    [
-    <TitleComponent text={lessonPlan.title} />,
-    <DescriptionComponent text='description' />,
-    <div></div>,
-    <div></div>,
-    <div></div>
-    ]*/
 
     return (
         <Box
@@ -229,9 +259,30 @@ function LessonPage() {
                 overflow: 'hidden',
                 bgcolor:'lightgray'
             }}>
-          <LessonPageComponent
-            key={pageComponents.map((component, index) => `${index}-${component.type}`).join('-')}
-            components={pageComponents} />
+            {lessonPages[currentPageIndex] && <LessonPageComponent
+            key={lessonPages[currentPageIndex].map((component, index) => `${index}-${component.type}`).join('-')}
+            components={lessonPages[currentPageIndex]} />}
+            <Box
+            sx={{
+              display:'flex',
+              flexDirection:'row',
+              justifyContent:'space-between',
+              gap:'1rem',
+              position:'absolute',
+              bottom:'1rem',
+              scale:'0.7'
+            }}>
+              <DefaultButton disabled={currentPageIndex <= 0} label='previous' onClick={() => setCurrentPageIndex(currentPageIndex-1)} />
+              <DefaultButton label='New Page' onClick={() => addPage()}
+                sx={{
+                  backgroundColor:'green',
+                  ':hover': {
+                    backgroundColor:'lime',
+                  },
+                }} />
+              <DefaultButton disabled={currentPageIndex === lessonPages.length - 1} label='next' onClick={() => setCurrentPageIndex(currentPageIndex+1)} />
+            </Box>
+
         </Box>
 
       </Box>
