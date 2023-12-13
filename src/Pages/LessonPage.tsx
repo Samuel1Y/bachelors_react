@@ -11,6 +11,7 @@ import DescriptionComponent from '../Components/DescriptionComponent'
 import { DefaultText, Title } from '../Components/Text'
 import { SaveLessonPagePayload } from '../Redux/payloadTypes'
 import { CodeBlockComponentProps, Description, Lesson, LessonPlan, PageComponent, Title as TitleType } from '../Components/Types'
+import CodeBlockComponent from '../Components/CodeBlockComponent'
 
 
 function LessonPage() {
@@ -238,7 +239,7 @@ function LessonPage() {
                     <DefaultText text='description Component' sx={{textAlign:'left', margin:'0.3rem'}} />
                 </div>
             </div>
-            <div className='CodeBlock' onClick={() => handleAddComponent(<TitleComponent text='New Title' type={'TitleComponent'} />)}>
+            <div className='CodeBlock' onClick={() => handleAddComponent({ type: 'CodeBlockComponent', jsonBlocks: '' })}>
                 <div style={{margin:'1.5rem', border:'2px solid black'}}>
                     <Title text='Code Block Component' sx={{lineHeight:'2.5rem'}} />
                 </div>

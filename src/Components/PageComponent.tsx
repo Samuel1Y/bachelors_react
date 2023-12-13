@@ -2,6 +2,7 @@ import React from 'react';
 import TitleComponent from './TitleComponent';
 import { PageComponentProps } from './Types';
 import DescriptionComponent from './DescriptionComponent';
+import CodeBlockComponent from './CodeBlockComponent';
 
 const PageComponent: React.FC<PageComponentProps> = ({ component }) => {
   switch (component.type) {
@@ -16,6 +17,13 @@ const PageComponent: React.FC<PageComponentProps> = ({ component }) => {
       return (
         <div className={component.type} style={{maxWidth:'30rem', maxHeight:'8rem'}}>
           <DescriptionComponent text={component.text} type={'DescriptionComponent'} />
+        </div>
+      )
+
+      case 'CodeBlockComponent':
+      return (
+        <div className={component.type} style={{maxWidth:'30rem', maxHeight:'8rem'}}>
+          <CodeBlockComponent jsonBlocks={component.jsonBlocks} type={'CodeBlockComponent'} />
         </div>
       )
     default:

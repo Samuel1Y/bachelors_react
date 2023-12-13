@@ -37,6 +37,7 @@ export type ButtonProps = {
     slot?: number,
     pageNumber?: number,
     jsonBlocks?: string,
+    sx?: object,
   }
 
   export type PageComponent = TitleComponentProps | DescriptionComponentProps | CodeBlockComponentProps
