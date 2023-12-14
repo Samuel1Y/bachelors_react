@@ -8,14 +8,14 @@ const PageComponent: React.FC<PageComponentProps> = ({ component }) => {
     case 'TitleComponent':
       return(
         <div className={component.type} style={{maxWidth:'30rem', maxHeight:'8rem'}}>
-          <TitleComponent text={component.text} type={'TitleComponent'} />
+          <TitleComponent text={component.text} type={'TitleComponent'} slot={component.slot} pageNumber={component.pageNumber} />
         </div>
       )
 
     case 'DescriptionComponent':
       return (
         <div className={component.type} style={{maxWidth:'30rem', maxHeight:'8rem'}}>
-          <DescriptionComponent text={component.text} type={'DescriptionComponent'} />
+          <DescriptionComponent text={component.text} type={'DescriptionComponent'} slot={component.slot} pageNumber={component.pageNumber} />
         </div>
       )
     default:

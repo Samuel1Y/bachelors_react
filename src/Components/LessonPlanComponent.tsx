@@ -5,22 +5,24 @@ import { Box, Typography } from '@mui/material'
 import { useAppDispatch } from '../Redux/hooks'
 import { DefaultButton } from './DefaultButton'
 import { useNavigate } from 'react-router-dom'
+import { connect } from 'react-redux'
+import { removeLessonPlan } from '../Redux/Reducers/LessonPlanListSlice'
 
-export const LessonPlanComponent: React.FC<LessonPlanProps> = ({
+const LessonPlanComponent: React.FC<LessonPlanProps> = ({
   title,
   sx,
 }) => {
 
   const navigate = useNavigate() //use for navigation
+  const dispatch = useAppDispatch()
 
   const handleClick = () => {
-    // dispatch(shareLessonPlanAPI(titleInput))
     navigate('/'+title)
   }
 
   const handleRemove = () => {
-    // dispatch(shareLessonPlanAPI(titleInput))
-    console.log(title)
+    dispatch(removeLessonPlan(title))
+    console.log('removed Lesson Plan: '+ title)
   }
 
 return (
@@ -34,6 +36,7 @@ return (
     padding:'0.5rem',
     width:'-webkit-fill-available',
     height:'2rem',
+    minWidth:'27rem',
     border:'2px solid lightgray',
     borderRadius: '8px',
   }}
@@ -48,7 +51,7 @@ return (
   >
     {title}
   </Typography>
-  <DefaultButton label='Remove' 
+  {title !== 'Saved Lessons' && <DefaultButton label='Remove' 
 onClick={(e) => {
   e.stopPropagation(); // Prevent the click event from reaching the parent div
   handleRemove();}}
@@ -64,6 +67,7 @@ onClick={(e) => {
         '&.Mui-disabled': {
           opacity:'.4',
         },
-    }} />
+    }} />}
   </div>
 )}
+export default connect(null, { removeLessonPlan })(LessonPlanComponent)

@@ -1,26 +1,43 @@
 import { TextField } from "@mui/material";
 import { DescriptionComponentProps } from "./Types";
-import React, { useEffect } from "react";
+import React from "react";
 import { connect } from "react-redux";
-import { useAppDispatch } from "../Redux/hooks";
+import { useAppDispatch, useAppSelector } from "../Redux/hooks";
+import { useLocation } from "react-router";
+import { updateComponent } from "../Redux/Reducers/LessonPlanListSlice";
+import { UpdateComponentPayload } from "../Redux/payloadTypes";
 
- const DescriptionComponent: React.FC<DescriptionComponentProps> = ({ sx, text, slot, pageNumber }) => {
+ const DescriptionComponent: React.FC<DescriptionComponentProps> = ({ sx, text, type, slot, pageNumber }) => {
 
-  const [descriptionInput, setDescriptionInput] = React.useState(text)
-
+  const { pathname } = useLocation()
   const dispatch = useAppDispatch()
 
+  const [descriptionInput, setDescriptionInput] = React.useState(text)
+  const currentLessonPlan = useAppSelector((state) => state.lessonPlan.currentLessonPlan)
+  const currentLesson = currentLessonPlan?.lessons.find((lesson) => lesson.title === pathname.split('/')[2].replace('%20', ' '))
 
-  useEffect(() => {
-  },[dispatch]);
+  const handleUpdate = (text: string) => {
+    let payload: UpdateComponentPayload = {
+      lessonPlanTitle: currentLessonPlan?.title || 'error',
+      lessonTitle: currentLesson?.title || 'error',
+      text: text,
+      type: type,
+      slot: slot || -1,
+      pageNumber: pageNumber || -1
+    }
+
+    dispatch(updateComponent(payload))
+  }
 
    return (
     <TextField
       multiline
       maxRows={4}
       value={descriptionInput}
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDescriptionInput(e.target.value)}
-      inputProps={{style: {
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+        setDescriptionInput(e.target.value)
+        handleUpdate(e.target.value)}}
+        inputProps={{style: {
         fontSize: '0.9rem',
         lineHeight: '1.2rem',
         width:'-webkit-fill-available',
@@ -41,4 +58,4 @@ import { useAppDispatch } from "../Redux/hooks";
     </TextField>
 )}
 
-export default connect(null, { })(DescriptionComponent)
+export default connect(null, { updateComponent })(DescriptionComponent)

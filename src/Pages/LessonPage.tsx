@@ -1,16 +1,15 @@
-import { Box, TextField } from '@mui/material'
-import React, { useEffect, useRef } from 'react'
+import { Box } from '@mui/material'
+import React, { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../Redux/hooks'
 import { connect } from 'react-redux'
 import { LessonPageComponent } from '../Components/LessonPageComponent'
 import { DefaultButton } from '../Components/DefaultButton'
 import TitleComponent from '../Components/TitleComponent'
-import { addLessonPlan, saveLessonPage } from '../Redux/Reducers/LessonPlanListSlice'
-import DescriptionComponent from '../Components/DescriptionComponent'
+import { addComponent, addLessonPlan, saveLessonPage, updateComponent } from '../Redux/Reducers/LessonPlanListSlice'
 import { DefaultText, Title } from '../Components/Text'
-import { SaveLessonPagePayload } from '../Redux/payloadTypes'
-import { CodeBlockComponentProps, Description, Lesson, LessonPlan, PageComponent, Title as TitleType } from '../Components/Types'
+import { AddComponentPayload, SaveLessonPagePayload } from '../Redux/payloadTypes'
+import { Lesson, LessonPlan, PageComponent, Title as TitleType } from '../Components/Types'
 
 
 function LessonPage() {
@@ -42,12 +41,11 @@ function LessonPage() {
     pages.push(newPage)
     setLessonPages(pages)
     setCurrentPageIndex(lessonPages.length-1)
-
   }
 
     const createPageComponents = () => {
-      const lessonPlanTitle = pathname.split('/')[1];
-      const lessonTitle = pathname.split('/')[2];
+      const lessonPlanTitle = pathname.split('/')[1].replace('%20', ' ');
+      const lessonTitle = pathname.split('/')[2].replace('%20', ' ');
       const lesson = lessonPlanList
         .find((lessonPlan: LessonPlan) => lessonPlan.title === lessonPlanTitle)
         ?.lessons.find((lesson: Lesson) => lesson.title === lessonTitle)
@@ -128,8 +126,8 @@ function LessonPage() {
 
     const handleDone = () => {
         const payload = {
-            lessonPlanTitle: pathname.split('/')[1],
-            lessonTitle: pathname.split('/')[2],
+            lessonPlanTitle: pathname.split('/')[1].replace('%20', ' '),
+            lessonTitle: pathname.split('/')[2].replace('%20', ' '),
             titles: [],
             descriptions: [],
             codeBlocks: [],
@@ -170,21 +168,29 @@ function LessonPage() {
           });
           payload.numberOfPages = pageIndex+1
         });
-         dispatch(saveLessonPage(payload))
+        dispatch(saveLessonPage(payload))
         navigate('/'+pathname.split('/')[0]+ pathname.split('/')[1])
     }
 
     const handleAddComponent = (newComponent: PageComponent) => {
-      const slot = lessonPages[currentPageIndex].length + 1;
-      const pageNumber = 1;
+      newComponent.slot = lessonPages[currentPageIndex].length + 1
+      newComponent.pageNumber = currentPageIndex+1
   
       if (lessonPages[currentPageIndex].length < 5) {
         setLessonPages((prevPages) => {
           const updatedPages = [...prevPages];
           updatedPages[currentPageIndex] = [
             ...updatedPages[currentPageIndex],
-            { ...newComponent, slot, pageNumber },
+            { ...newComponent },
           ];
+          const lessonPlanTitle = pathname.split('/')[1].replace('%20', ' ');
+          const lessonTitle = pathname.split('/')[2].replace('%20', ' ');
+          const payload: AddComponentPayload = {
+            lessonPlanTitle: lessonPlanTitle,
+            lessonTitle: lessonTitle,
+            component: newComponent
+          }
+          dispatch(addComponent(payload))
           return updatedPages;
         });
       } else {
@@ -197,7 +203,8 @@ function LessonPage() {
         {
           createPageComponents()
         }
-    }, []);
+    }, [lessonPlanList]);
+
 
     return (
         <Box
@@ -228,7 +235,7 @@ function LessonPage() {
                 flex:1,
             }}
             >
-            <div className='Title' onClick={() => handleAddComponent({ type: 'TitleComponent', text: 'New Title' })}>
+            <div className='Title' onClick={() => handleAddComponent({ type: 'TitleComponent', text: 'New Title'})}>
                 <div style={{margin:'1.5rem', border:'2px solid black'}}>
                     <Title text='Title Component' />
                 </div>
@@ -238,7 +245,7 @@ function LessonPage() {
                     <DefaultText text='description Component' sx={{textAlign:'left', margin:'0.3rem'}} />
                 </div>
             </div>
-            <div className='CodeBlock' onClick={() => handleAddComponent(<TitleComponent text='New Title' type={'TitleComponent'} />)}>
+            <div className='CodeBlock' onClick={() => handleAddComponent(<TitleComponent text='New Title' type={'TitleComponent'} slot={-1} pageNumber={-1} />)}>
                 <div style={{margin:'1.5rem', border:'2px solid black'}}>
                     <Title text='Code Block Component' sx={{lineHeight:'2.5rem'}} />
                 </div>
@@ -290,4 +297,4 @@ function LessonPage() {
     )
 }
 
-export default connect(null, { addLessonPlan, saveLessonPage })(LessonPage)
+export default connect(null, { addLessonPlan, saveLessonPage, addComponent, updateComponent })(LessonPage)

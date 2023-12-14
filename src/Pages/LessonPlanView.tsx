@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import { setCurrentLessonPlan } from '../Redux/Reducers/lessonPlanSlice';
 import { addLesson, addLessonPlan } from '../Redux/Reducers/LessonPlanListSlice';
 import { LessonPlan } from '../Components/Types';
-import { LessonComponent } from '../Components/LessonComponent';
+import LessonComponent from '../Components/LessonComponent';
 
 
 function LessonPlanView() {
@@ -20,24 +20,25 @@ function LessonPlanView() {
     const { pathname } = useLocation()
     const lessonPlanList = useAppSelector((state) => state.lessonPlanList.lessonPlans)
     const currentLessonPlan = useAppSelector((state) => state.lessonPlan.currentLessonPlan)
+    const isLoggedIn = useAppSelector((state) => state.teacher.isLoggedIn)
 
     const dispatch = useAppDispatch()
 
     const handleCreateLesson = (LessonTitleInput:string) => {
-      const payload = {
-        LessonPlanTitle: currentLessonPlan?.title,
-        LessonTitle: LessonTitleInput
-      }
-      dispatch(addLesson(payload))
-      setLessonTitleInput('')
+      if(LessonTitleInput.length > 0)
+      {
+        const payload = {
+          LessonPlanTitle: currentLessonPlan?.title,
+          LessonTitle: LessonTitleInput
+        }
+        dispatch(addLesson(payload))
+        setLessonTitleInput('')
+      } else console.log('Lesson input must have at least 1 character')
     }
 
     useEffect(() => {
-      if(pathname.split('/')[1] === 'Saved%20Lessons')
-      {
-          dispatch(setCurrentLessonPlan(lessonPlanList.find((lessonPlan: LessonPlan) => lessonPlan.title === 'Saved Lessons')))
-      }
-      else dispatch(setCurrentLessonPlan(lessonPlanList.find((lessonPlan: LessonPlan) => lessonPlan.title === pathname.split('/')[1])))
+      const resultString = pathname.split('/')[1].replace('%20', ' ')
+      dispatch(setCurrentLessonPlan(lessonPlanList.find((lessonPlan: LessonPlan) => lessonPlan.title === resultString)))
     }, [dispatch, lessonPlanList, pathname])
 
 
@@ -53,7 +54,7 @@ function LessonPlanView() {
               width:'100vw',
               overflow: 'auto'
           }}>
-            <Title text={currentLessonPlan ? currentLessonPlan.title : ''}/>
+            <Title text={`Lessons of ${currentLessonPlan ? currentLessonPlan.title : ''}`}/>
             <Box
             sx={{
                 display: 'grid',
@@ -76,7 +77,7 @@ function LessonPlanView() {
             {currentLessonPlan?.lessons?.map((lessonPlan, index) => (
               <LessonComponent key={index} title={lessonPlan.title}/>
               ))}
-              
+            {isLoggedIn && currentLessonPlan?.title !== 'Saved Lessons' &&
             <div
                 style={{
                   display:'flex',
@@ -130,8 +131,8 @@ function LessonPlanView() {
                     },
                   }} />
                   </Box>
-              </div>
-    </Box>
+              </div>}
+      </Box>
     </Box>
     )
 }
