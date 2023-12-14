@@ -6,8 +6,10 @@ import { useAppDispatch, useAppSelector } from '../Redux/hooks'
 import { DefaultButton } from './DefaultButton'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { shareLessonAPI } from '../Redux/Thunks/lessonThunk'
+import { removeLesson } from '../Redux/Reducers/LessonPlanListSlice'
+import { connect } from 'react-redux'
 
-export const LessonComponent: React.FC<LessonPlanProps> = ({
+const LessonComponent: React.FC<LessonPlanProps> = ({
   title,
   sx,
 }) => {
@@ -17,18 +19,22 @@ export const LessonComponent: React.FC<LessonPlanProps> = ({
   const { pathname } = useLocation()
   const currentLessonPlan = useAppSelector((state) => state.lessonPlan.currentLessonPlan)
   const status = useAppSelector((state) => state.lessonPlanList.status)
+  const isLoggedIn = useAppSelector((state) => state.teacher.isLoggedIn)
 
 
 
   const handleClick = () => {
-    // dispatch(shareLessonPlanAPI(titleInput))
-    const lessonPlanTitle = pathname.split('/')[1]
+    const lessonPlanTitle = pathname.split('/')[1].replace('%20', ' ')
     navigate('/'+lessonPlanTitle+'/'+title)
   }
 
   const handleRemove = () => {
-    // dispatch(shareLessonPlanAPI(titleInput))
-    console.log(title)
+    const payload = {
+      lessonPlanTitle: currentLessonPlan?.title,
+      lessonTitle: title
+    }
+    dispatch(removeLesson(payload))
+    console.log('removed Lesson: '+title)
   }
 
   const handleShare = () => {
@@ -77,7 +83,8 @@ return (
       justifyContent:'center',
 
     }}>
-  <DefaultButton label='Share' 
+    
+    {isLoggedIn && <DefaultButton label='Share' 
     disabled={status !== 'idle'}
     onClick={(e) => {
       e.stopPropagation(); // Prevent the click event from reaching the parent div
@@ -99,7 +106,7 @@ return (
         '&.Mui-disabled': {
           opacity:'.4',
         },
-    }} />
+    }} />}
   <DefaultButton label='Remove' 
     onClick={(e) => {
     e.stopPropagation(); // Prevent the click event from reaching the parent div
@@ -122,3 +129,4 @@ return (
     </Box>
   </div>
 )}
+export default connect(null, {  })(LessonComponent)

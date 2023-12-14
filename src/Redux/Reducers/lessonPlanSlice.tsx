@@ -14,18 +14,25 @@ const initialState = {
     status: null
 } as LessonPlanState
 
+const savedState = localStorage.getItem('lessonPlanState');
+const parsedState = savedState ? JSON.parse(savedState) as LessonPlanState : initialState
 
 export const lessonPlanSlice = createSlice({
   name: 'lessonPlans',
-  initialState,
+  initialState: parsedState,
   reducers: {
       setCurrentLessonPlan (state, action) {
-        return {...state, currentLessonPlan: action.payload}
+        state.currentLessonPlan = {...action.payload}
+        save(state)
+        return state
       },
     },
   },
 )
 
+function save (state: LessonPlanState){
+  localStorage.setItem('lessonPlanState', JSON.stringify(state));
+}
 
 export const { setCurrentLessonPlan } = lessonPlanSlice.actions
 

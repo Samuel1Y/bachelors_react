@@ -1,18 +1,33 @@
-import { Box, TextField } from "@mui/material";
+import { TextField } from "@mui/material";
 import { TitleComponentProps } from "./Types";
 import React, { useEffect } from "react";
 import { connect } from "react-redux";
-import { useAppDispatch } from "../Redux/hooks";
+import { useAppDispatch, useAppSelector } from "../Redux/hooks";
+import { updateComponent } from "../Redux/Reducers/LessonPlanListSlice";
+import { UpdateComponentPayload } from "../Redux/payloadTypes";
+import { useLocation } from "react-router";
 
-const TitleComponent: React.FC<TitleComponentProps> = ({ sx, text }) => {
+const TitleComponent: React.FC<TitleComponentProps> = ({ sx, text, type, slot, pageNumber }) => {
 
-  const [titleInput, setTitleInput] = React.useState(text)
-
+  const { pathname } = useLocation()
   const dispatch = useAppDispatch()
 
+  const [titleInput, setTitleInput] = React.useState(text)
+  const currentLessonPlan = useAppSelector((state) => state.lessonPlan.currentLessonPlan)
+  const currentLesson = currentLessonPlan?.lessons.find((lesson) => lesson.title === pathname.split('/')[2].replace('%20', ' '))
 
-  useEffect(() => {
-  },[titleInput, dispatch]);
+  const handleUpdate = (text: string) => {
+    let payload: UpdateComponentPayload = {
+      lessonPlanTitle: currentLessonPlan?.title || 'error',
+      lessonTitle: currentLesson?.title || 'error',
+      text: text,
+      type: type,
+      slot: slot || -1,
+      pageNumber: pageNumber || -1
+    }
+
+    dispatch(updateComponent(payload))
+  }
 
    return (
     
@@ -20,7 +35,9 @@ const TitleComponent: React.FC<TitleComponentProps> = ({ sx, text }) => {
       multiline
       maxRows={2}
       value={titleInput}
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitleInput(e.target.value)}
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+        setTitleInput(e.target.value)
+        handleUpdate(e.target.value)}}
       inputProps={{style: {
         fontSize: '3rem',
         lineHeight: '3rem',
@@ -43,4 +60,4 @@ const TitleComponent: React.FC<TitleComponentProps> = ({ sx, text }) => {
 )}
 
 
-export default connect(null, { })(TitleComponent)
+export default connect(null, { updateComponent })(TitleComponent)

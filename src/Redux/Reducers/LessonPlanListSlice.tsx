@@ -1,8 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { RootState } from '../store'
-import { CodeBlock, Description, Lesson, LessonPage, LessonPlan, Title } from '../../Components/Types';
+import { CodeBlock, Description, Lesson, LessonPlan, Title } from '../../Components/Types';
 import { getLessonAPI, shareLessonAPI } from '../Thunks/lessonThunk';
-import { GetLessonPayload, SaveLessonPagePayload } from '../payloadTypes';
+import { AddComponentPayload, GetLessonPayload, SaveLessonPagePayload, UpdateComponentPayload } from '../payloadTypes';
 
 // Define a type for the slice state
 export interface LessonPlanListState {
@@ -51,7 +51,11 @@ export const lessonPlanListSlice = createSlice({
         return state
       },
       removeLessonPlan (state, action) {
-        return {...state, ...action.payload}
+        const lessonPlanTitle = action.payload
+        state.lessonPlans = state.lessonPlans.filter((lessonPlan) => lessonPlan.title !== lessonPlanTitle)
+
+        save(state)
+        return state
       },
       addLesson (state, action) {
         const lesson = {
@@ -74,7 +78,19 @@ export const lessonPlanListSlice = createSlice({
         return state
       },
       removeLesson (state, action) {
-        return {...state, ...action.payload}
+        const lessonPlanTitle = action.payload.lessonPlanTitle
+        const lessonTitle = action.payload.lessonTitle
+
+        const updatedLessonPlans = state.lessonPlans.map((lessonPlan) => {
+          if (lessonPlan.title === lessonPlanTitle) {
+              lessonPlan.lessons = lessonPlan.lessons.filter((lesson) => lesson.title !== lessonTitle)
+          }
+          return lessonPlan
+        });
+        state.lessonPlans = updatedLessonPlans
+        
+        save(state)
+        return state
       },
       setLastSharedLessonSharingTime (state, action) {
         state.lastSharedLessonSharingTime = action.payload
@@ -91,6 +107,106 @@ export const lessonPlanListSlice = createSlice({
         save(state)
         return state
       },
+      addComponent(state, action) {
+        const payload = action.payload as AddComponentPayload
+        if(payload.component!.pageNumber! > state.lessonPlans.find((lessonPlan) => lessonPlan.title === payload.lessonPlanTitle)!.lessons.find((lesson) => lesson.title === payload.lessonTitle)!.numberOfPages)
+        {
+          state.lessonPlans.find((lessonPlan) => lessonPlan.title === payload.lessonPlanTitle)!.lessons.find((lesson) => lesson.title === payload.lessonTitle)!.numberOfPages = payload.component.pageNumber || -1
+        }
+      
+          switch (payload.component.type) {
+            case 'TitleComponent':
+              const newTitle: Title = {
+                titleId: 0,
+                slot: payload.component.slot || -1,
+                pageNumber: payload.component.pageNumber || -1,
+                text: payload.component.text || 'no text',
+              }
+              state.lessonPlans.find(
+              (lessonPlan) => lessonPlan.title === payload.lessonPlanTitle
+              )!.lessons.find((lesson) => lesson.title === payload.lessonTitle
+              )!.titles.push(newTitle)   
+              break
+            case 'DescriptionComponent':
+              const newDescription: Description = {
+                descriptionId: 0,
+                slot: payload.component.slot || -1,
+                pageNumber: payload.component.pageNumber || -1,
+                text: payload.component.text || 'no text',
+              }
+              state.lessonPlans.find(
+              (lessonPlan) => lessonPlan.title === payload.lessonPlanTitle
+              )!.lessons.find((lesson) => lesson.title === payload.lessonTitle
+              )!.descriptions.push(newDescription)   
+              break
+              /*
+            case 'CodeBlockComponent':
+              state.lessonPlans.find(
+                (lessonPlan) => lessonPlan.title === payload.lessonPlanTitle
+              )?.lessons.find((lesson) => lesson.title === payload.lessonTitle
+              )?.codeBlocks.map((codeBlock) => {
+              if(codeBlock.pageNumber === payload.pageNumber && codeBlock.slot === payload.slot)
+              {
+                codeBlock.jsonBlocks = payload.jsonBlocks || 'no json'
+              }}
+              )      
+              break
+              */
+            default:
+              console.log('wrong component type')
+              break   
+          }
+        
+        save(state)
+        return state;     
+      },
+      updateComponent(state, action) {
+        const payload = action.payload as UpdateComponentPayload
+      
+          switch (payload.type) {
+            case 'TitleComponent':
+              state.lessonPlans.find(
+                (lessonPlan) => lessonPlan.title === payload.lessonPlanTitle
+              )!.lessons.find((lesson) => lesson.title === payload.lessonTitle
+              )!.titles.forEach((title, index) => {
+              if(title.pageNumber === payload.pageNumber && title.slot === payload.slot)
+                {
+                  title.text = payload.text || 'no text'
+                }
+              }
+              )      
+              break
+            case 'DescriptionComponent':
+              state.lessonPlans.find(
+                (lessonPlan) => lessonPlan.title === payload.lessonPlanTitle
+              )?.lessons.find((lesson) => lesson.title === payload.lessonTitle
+              )?.descriptions.forEach((description) => {
+              if(description.pageNumber === payload.pageNumber && description.slot === payload.slot)
+              {
+                description.text = payload.text || 'no text'
+              }}
+              )      
+              break
+            case 'CodeBlockComponent':
+              state.lessonPlans.find(
+                (lessonPlan) => lessonPlan.title === payload.lessonPlanTitle
+              )?.lessons.find((lesson) => lesson.title === payload.lessonTitle
+              )?.codeBlocks.forEach((codeBlock) => {
+              if(codeBlock.pageNumber === payload.pageNumber && codeBlock.slot === payload.slot)
+              {
+                codeBlock.jsonBlocks = payload.jsonBlocks || 'no json'
+              }}
+              )      
+              break
+            default:
+              console.log('wrong component type')
+              break
+              
+          }
+        
+        save(state)
+        return state;
+      }      
     },
     extraReducers: builder => {
       builder
@@ -131,7 +247,7 @@ function save (state: LessonPlanListState){
   localStorage.setItem('lessonPlanListState', JSON.stringify(state));
 }
 
-export const { setLessonPlanList, addLessonPlan, removeLessonPlan, addLesson, addRedeemedLesson, removeLesson, saveLessonPage, setLastSharedLessonSharingTime } = lessonPlanListSlice.actions
+export const { setLessonPlanList, addLessonPlan, removeLessonPlan, addLesson, addRedeemedLesson, removeLesson, saveLessonPage, setLastSharedLessonSharingTime, addComponent, updateComponent } = lessonPlanListSlice.actions
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectLessonPlan = (state: RootState) => state.lessonPlanList

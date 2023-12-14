@@ -11,11 +11,8 @@ export interface TeacherSliceState {
 
 // Define the initial state using that type
 const initialState = {
-    teacher: {
-        username: 'teacher1',
-        token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZWFjaGVyMSIsIm5iZiI6MTcwMTg2MDYyNiwiZXhwIjoxNzAxOTAzODI2LCJpYXQiOjE3MDE4NjA2MjYsImlzcyI6IkJhY2hlbG9yX2FwcCIsImF1ZCI6IkJhY2hlbG9yX2FwcCJ9.3rtxnBM8yp9dEZwOW_cFv5rXCh-n8tPWsbAhD2r6ZYk',
-    },
-    isLoggedIn: true,
+    teacher: null,
+    isLoggedIn: false,
     status: 'idle'
 } as TeacherSliceState
 

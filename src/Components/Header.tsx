@@ -8,6 +8,7 @@ import { setLastSharedLessonSharingTime } from '../Redux/Reducers/LessonPlanList
 import { connect } from 'react-redux'
 import { logOut } from '../Redux/Reducers/TeacherSlice'
 import { loginTeacherAPI } from '../Redux/Thunks/TeacherThunk'
+import { useLocation, useNavigate } from 'react-router'
 
 const Header: React.FC<HeaderProps> = ({
 }) => {
@@ -22,6 +23,8 @@ const Header: React.FC<HeaderProps> = ({
     const loggedTeacher = useAppSelector((state) => state.teacher.teacher)
 
     const dispatch = useAppDispatch()
+    const navigate = useNavigate()
+    const { pathname } = useLocation()
 
     const [count, setCount] = React.useState(lastSharedLessonSharingTime)
 
@@ -52,6 +55,8 @@ const Header: React.FC<HeaderProps> = ({
               password: password,
             }
             await dispatch(loginTeacherAPI(args))
+            setUsername('')
+            setPassword('')
             handleClose()
         }
         
@@ -80,15 +85,17 @@ const Header: React.FC<HeaderProps> = ({
         justifyContent: 'space-between',        
         maxHeight: '100vh',
         minWidth: '100vw',
-        backgroundColor: '#282a32',
+        minHeight:'5rem',
+        backgroundColor: '#494D5F',
      }}>
-        <Box
-        sx={{
-            display:'flex',
-            width:'10rem'
-        }}>  
-        </Box>
-        <Title text='LEGO   '/>
+        <img 
+            src='legoeducation.png'
+            alt='Logo'
+            onClick={() => navigate(pathname.split('/')[0])}
+            style={{
+                width:'15rem',
+                cursor:'pointer'
+            }}/>
         <Box
         sx={{
             display:'flex',
@@ -126,7 +133,7 @@ const Header: React.FC<HeaderProps> = ({
                 Log out
             </Typography>}
         </Box>
-        {(count >= 0) &&
+        {(count >= 0) && !(pathname.split('/')[2] && pathname.split('/')[2].length > 0) && //currently sharing lesson display
         <Box
         sx={{
             display: 'flex',
@@ -134,7 +141,9 @@ const Header: React.FC<HeaderProps> = ({
             alignItems: 'center',
             justifyContent: 'space-evenly',
             width:'100%',
-            backgroundColor: 'lime',
+            position: 'absolute',
+            bottom:0,
+            backgroundColor: 'slateGray',
          }}>
             <Subtitle text={`Currently Sharing: ${lastSharedLessonTitle}`}/>
             <Subtitle text={`Code:${lastSharedLessonCode}`}/>

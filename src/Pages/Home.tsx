@@ -1,13 +1,11 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material'
 import React, { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { DefaultButton } from '../Components/DefaultButton';
-import { Subtitle, Title } from '../Components/Text';
+import { Title } from '../Components/Text';
 import { useAppDispatch, useAppSelector } from '../Redux/hooks'
 import { connect } from 'react-redux';
-import { selectLessonPlan, LessonPlanState  } from '../Redux/Reducers/lessonPlanSlice';
-import { addLessonPlan, addRedeemedLesson, setLessonPlanList } from '../Redux/Reducers/LessonPlanListSlice';
-import { LessonPlanComponent } from '../Components/LessonPlanComponent';
+import { addLessonPlan, addRedeemedLesson } from '../Redux/Reducers/LessonPlanListSlice';
+import LessonPlanComponent from '../Components/LessonPlanComponent';
 import { LessonPlan } from '../Components/Types';
 import { getLessonAPI } from '../Redux/Thunks/lessonThunk';
 
@@ -15,17 +13,13 @@ import { getLessonAPI } from '../Redux/Thunks/lessonThunk';
 function Home() {
 
 
-    const [codeInput, setCodeInput] = React.useState('226492')
-    const [titleInput, setTitleInput] = React.useState('')
+    const [codeInput, setCodeInput] = React.useState('')
     const [LessonPlanTitleInput, setLessonPlanTitleInput] = React.useState('')
 
-    const [generatedCode, setGeneratedCode] = React.useState('')
-
-    const navigate = useNavigate() //use for navigation
-    const lessonPlan = useAppSelector((state) => state.lessonPlan)
     const lessonPlanListStatus = useAppSelector((state) => state.lessonPlanList.status)
     const lessonPlanList = useAppSelector((state) => state.lessonPlanList.lessonPlans)
     const redeemedLesson = useAppSelector((state) => state.lessonPlanList.lastRedeemedLesson)
+    const isLoggedIn = useAppSelector((state) => state.teacher.isLoggedIn)
     const dispatch = useAppDispatch()
 
     const handleRedeem = async () => {
@@ -34,8 +28,12 @@ function Home() {
     }
 
     const handleCreateLessonPlan = (LessonPlanTitleInput:string) => {
+      if(LessonPlanTitleInput.length > 0)
+      {
         dispatch(addLessonPlan(LessonPlanTitleInput))
-        //setLessonPlanTitleInput('')
+        setLessonPlanTitleInput('')
+      } else console.log('Lesson Plan input must have at least 1 character')
+
     }
 
     // pop up
@@ -101,7 +99,7 @@ function Home() {
                 />
                 <DefaultButton
                     label='redeem'
-                    disabled={lessonPlanListStatus !== 'idle'}
+                    disabled={lessonPlanListStatus !== 'idle'|| !/^\d{6}$/.test(codeInput)}
                     onClick={handleRedeem}
                     sx={{
                         height: 'auto',
@@ -110,7 +108,9 @@ function Home() {
                 />
             </Box>
         </Box>
-            <Box
+        <Box>
+        <Title text='Lesson Plans' />
+          <Box
             sx={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -126,10 +126,10 @@ function Home() {
                 maxHeight: '89vh',
                 overflow: 'auto'
             }}>
-            {lessonPlanList?.map((lessonPlan: LessonPlan, index: number) => (
+            {isLoggedIn ? lessonPlanList?.map((lessonPlan: LessonPlan, index: number) => (
               <LessonPlanComponent key={index} title={lessonPlan.title}/>
-              ))}
-              
+              )): <LessonPlanComponent key={0} title={lessonPlanList[0].title}/>}
+              {isLoggedIn &&
               <div
                 style={{
                     display:'flex',
@@ -170,8 +170,9 @@ function Home() {
                         opacity:'.4',
                         },
                     }} />
-            </div>
-    </Box>
+            </div>}
+          </Box>
+        </Box>
     <React.Fragment>
       <Dialog
         open={open}
