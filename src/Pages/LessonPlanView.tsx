@@ -37,7 +37,7 @@ function LessonPlanView() {
     }
 
     useEffect(() => {
-      const resultString = pathname.split('/')[1].replace('%20', ' ')
+      const resultString = pathname.split('/')[1].replace(/%20/g, ' ')
       dispatch(setCurrentLessonPlan(lessonPlanList.find((lessonPlan: LessonPlan) => lessonPlan.title === resultString)))
     }, [dispatch, lessonPlanList, pathname])
 
